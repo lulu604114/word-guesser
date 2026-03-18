@@ -21,11 +21,21 @@ const Game: React.FC<GameProps> = ({ wordList, onGameOver, onQuit }) => {
 
   const currentWord = wordList.words[currentIndex];
 
+  const progressPercent = ((currentIndex) / wordList.words.length) * 100;
+
   return (
     <div className="glass-panel game-container">
       <div className="game-header">
-        <div className="progress">
-          Mot {currentIndex + 1} / {wordList.words.length}
+        <div className="progress-wrapper">
+          <div className="progress-text">
+            Mot {currentIndex + 1} sur {wordList.words.length}
+          </div>
+          <div className="progress-bar-container">
+            <div 
+              className="progress-bar-fill" 
+              style={{ width: `${progressPercent}%` }}
+            ></div>
+          </div>
         </div>
         <button className="quit-btn" onClick={onQuit}>
           Quitter la partie

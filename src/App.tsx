@@ -27,7 +27,7 @@ function App() {
 
   return (
     <div className="app-container">
-      <h1 className="title">Word Guesser</h1>
+      <h1 className="title">Devinettes</h1>
       
       {appState === 'HOME' && (
         <Home 
