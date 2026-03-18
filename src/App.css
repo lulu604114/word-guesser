@@ -311,3 +311,77 @@
   background: rgba(34, 197, 94, 0.1);
   border-radius: 6px;
 }
+
+/* Sentence Step styles */
+.sentence-step-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  text-align: center;
+  animation: fadeIn 0.4s ease-out;
+}
+
+.sentence-step-container h3 {
+  font-size: 1.8rem;
+  color: var(--success-color);
+  margin-bottom: 0.2rem;
+}
+
+.word-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  justify-content: center;
+  margin: 1.5rem 0;
+}
+
+.word-pill {
+  border-radius: 30px;
+  padding: 0.8rem 1.5rem;
+  font-size: 1.1rem;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+  cursor: pointer;
+  box-shadow: none;
+}
+
+.word-pill.selected {
+  background: var(--primary-color);
+  color: white;
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: scale(1.05);
+  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+}
+
+.word-pill.unselected {
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.4);
+  filter: grayscale(100%);
+}
+
+.word-pill.unselected:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.9);
+  transform: translateY(-2px);
+}
+
+.sentence-input {
+  width: 100%;
+  padding: 1.5rem;
+  font-size: 1.2rem;
+  background: rgba(0, 0, 0, 0.25);
+  border: 2px solid var(--glass-border);
+  border-radius: 12px;
+  color: white;
+  font-family: inherit;
+  resize: vertical;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.sentence-input:focus {
+  border-color: var(--primary-color);
+  background: rgba(0, 0, 0, 0.4);
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2);
+}
+

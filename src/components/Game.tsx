@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import type { WordList } from '../data/wordLists';
 import WordGuess from './WordGuess';
+import SentenceStep from './SentenceStep';
 
 type GameProps = {
   wordList: WordList;
@@ -11,11 +12,29 @@ type GameProps = {
 const Game: React.FC<GameProps> = ({ wordList, onGameOver, onQuit }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showPopover, setShowPopover] = useState(false);
+  const [showSentenceStep, setShowSentenceStep] = useState(false);
 
   const handleCorrectGuess = () => {
-    if (currentIndex < wordList.words.length - 1) {
-      setCurrentIndex(prev => prev + 1);
+    const nextIndex = currentIndex + 1;
+    if (nextIndex < wordList.words.length) {
+      if (nextIndex % 5 === 0) {
+        setShowSentenceStep(true);
+      }
+      setCurrentIndex(nextIndex);
     } else {
+      if (nextIndex % 5 === 0) {
+        setShowSentenceStep(true);
+        setCurrentIndex(nextIndex);
+      } else {
+        onGameOver();
+      }
+    }
+  };
+
+  const handleSentenceContinue = (sentence: string) => {
+    console.log("Phrase créée :", sentence);
+    setShowSentenceStep(false);
+    if (currentIndex >= wordList.words.length) {
       onGameOver();
     }
   };
@@ -25,6 +44,23 @@ const Game: React.FC<GameProps> = ({ wordList, onGameOver, onQuit }) => {
   const progressPercent = ((currentIndex) / wordList.words.length) * 100;
   
   const guessedWords = wordList.words.slice(0, currentIndex);
+
+  if (showSentenceStep) {
+    const recentWords = wordList.words.slice(currentIndex - 5, currentIndex);
+    return (
+      <div className="glass-panel game-container">
+        <div className="game-header">
+          <div className="progress-wrapper">
+            <span className="progress-text">Création de phrase...</span>
+          </div>
+          <button className="quit-btn" onClick={onQuit}>
+            Quitter la partie
+          </button>
+        </div>
+        <SentenceStep words={recentWords} onContinue={handleSentenceContinue} />
+      </div>
+    );
+  }
 
   return (
     <>
