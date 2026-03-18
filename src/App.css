@@ -41,7 +41,7 @@
   background: rgba(255, 255, 255, 0.1);
   transform: translateY(-6px);
   border-color: rgba(255, 255, 255, 0.3);
-  box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
 }
 
 .list-card.selected {
@@ -85,7 +85,7 @@
   background: rgba(0, 0, 0, 0.2);
   border-radius: 8px;
   overflow: hidden;
-  box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 .progress-bar-fill {
@@ -268,7 +268,7 @@
   align-items: center;
   justify-content: center;
   padding: 0 6px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
 }
 
 .guessed-popover {
@@ -310,6 +310,87 @@
   padding: 0.4rem 0.6rem;
   background: rgba(34, 197, 94, 0.1);
   border-radius: 6px;
+  display: flex;
+  align-items: center;
+}
+
+.guessed-list li.skipped-word {
+  color: var(--error-color);
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.input-group {
+  display: flex;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.input-group .guess-input {
+  flex: 1;
+}
+
+.input-submit-btn {
+  padding: 0 1.5rem;
+  font-size: 1.1rem;
+  width: auto;
+  flex: 0 0 auto;
+}
+
+.reveal-word-btn {
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px dashed rgba(255, 255, 255, 0.3);
+  padding: 0.8rem;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 1rem;
+  width: 100%;
+}
+
+.reveal-word-btn:hover {
+  border-color: rgba(255, 255, 255, 0.6);
+  color: white;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.revealed-word-text {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--primary-color);
+  margin: 1.5rem 0;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.word-revealed-panel {
+  animation: fadeIn 0.4s ease-out;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+}
+
+.action-buttons button {
+  flex: 1;
+}
+
+.skip-btn {
+  background: rgba(239, 68, 68, 0.15);
+  color: #fca5a5;
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  box-shadow: none;
+  font-size: 1.2rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.skip-btn:hover {
+  background: rgba(239, 68, 68, 0.3);
+  color: white;
+  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
 }
 
 /* Sentence Step styles */
@@ -384,4 +465,3 @@
   background: rgba(0, 0, 0, 0.4);
   box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2);
 }
-

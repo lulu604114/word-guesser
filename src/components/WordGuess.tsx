@@ -4,12 +4,14 @@ import type { WordItem } from '../data/wordLists';
 type WordGuessProps = {
   wordItem: WordItem;
   onCorrectGuess: () => void;
+  onSkipGuess: () => void;
 };
 
-const WordGuess: React.FC<WordGuessProps> = ({ wordItem, onCorrectGuess }) => {
+const WordGuess: React.FC<WordGuessProps> = ({ wordItem, onCorrectGuess, onSkipGuess }) => {
   const [cluesRevealed, setCluesRevealed] = useState<number>(1);
   const [guess, setGuess] = useState('');
   const [isError, setIsError] = useState(false);
+  const [isRevealed, setIsRevealed] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Reset state when the word changes
@@ -17,6 +19,7 @@ const WordGuess: React.FC<WordGuessProps> = ({ wordItem, onCorrectGuess }) => {
     setCluesRevealed(1);
     setGuess('');
     setIsError(false);
+    setIsRevealed(false);
     
     // Focus the input to keep the flow smooth
     if (inputRef.current) {
@@ -49,6 +52,25 @@ const WordGuess: React.FC<WordGuessProps> = ({ wordItem, onCorrectGuess }) => {
     }
   };
 
+  if (isRevealed) {
+    return (
+      <div className="word-guess-container word-revealed-panel" style={{ textAlign: 'center' }}>
+        <h3 style={{ color: 'var(--text-main)', marginBottom: '0.5rem' }}>Découverte du mot</h3>
+        <p style={{ color: 'var(--text-muted)' }}>Le mot à trouver était :</p>
+        <div className="revealed-word-text">{wordItem.word}</div>
+        <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem' }}>L'aviez-vous trouvé par vous-même ?</p>
+        <div className="action-buttons">
+          <button className="submit-btn" onClick={onCorrectGuess}>
+            Oui, trouvé !
+          </button>
+          <button className="skip-btn" onClick={onSkipGuess}>
+            Pas trouvé
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="word-guess-container">
       <div className="clues-container">
@@ -71,17 +93,22 @@ const WordGuess: React.FC<WordGuessProps> = ({ wordItem, onCorrectGuess }) => {
       )}
 
       <form onSubmit={handleSubmit} className="guess-form">
-        <input
-          ref={inputRef}
-          type="text"
-          value={guess}
-          onChange={(e) => setGuess(e.target.value)}
-          placeholder="Entrez votre réponse..."
-          className={`guess-input ${isError ? 'shake' : ''}`}
-          autoComplete="off"
-        />
-        <button type="submit" className="submit-btn" disabled={!guess.trim()}>
-          Valider
+        <div className="input-group">
+          <input
+            ref={inputRef}
+            type="text"
+            value={guess}
+            onChange={(e) => setGuess(e.target.value)}
+            placeholder="Entrez votre réponse..."
+            className={`guess-input ${isError ? 'shake' : ''}`}
+            autoComplete="off"
+          />
+          <button type="submit" className="submit-btn input-submit-btn" disabled={!guess.trim()}>
+            Valider
+          </button>
+        </div>
+        <button type="button" className="reveal-word-btn" onClick={() => setIsRevealed(true)}>
+          Découvrir le mot
         </button>
       </form>
     </div>

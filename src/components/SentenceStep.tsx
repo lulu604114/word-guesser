@@ -20,8 +20,8 @@ const SentenceStep: React.FC<SentenceStepProps> = ({ words, onContinue }) => {
 
   return (
     <div className="sentence-step-container">
-      <h3>Bravo ! Vous avez trouvé 5 nouveaux mots 🌟</h3>
-      <p style={{ color: 'var(--text-muted)', marginBottom: '1rem' }}>
+      <h3 style={{ color: 'var(--text-main)', marginBottom: '0.5rem' }}>À vous de jouer !</h3>
+      <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem', fontSize: '1.05rem' }}>
         Sélectionnez au moins un mot ci-dessous et écrivez une phrase originale qui l'utilise.
       </p>
       

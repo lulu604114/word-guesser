@@ -13,7 +13,7 @@ const GameOver: React.FC<GameOverProps> = ({ wordList, onPlayAgain }) => {
       <p>
         Vous avez deviné tous les mots du thème <strong>{wordList.title}</strong> !
       </p>
-      
+
       <button className="play-again-btn" onClick={onPlayAgain}>
         Rejouer une partie
       </button>

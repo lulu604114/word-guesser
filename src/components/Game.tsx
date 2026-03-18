@@ -13,9 +13,11 @@ const Game: React.FC<GameProps> = ({ wordList, onGameOver, onQuit }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showPopover, setShowPopover] = useState(false);
   const [showSentenceStep, setShowSentenceStep] = useState(false);
+  const [skippedWords, setSkippedWords] = useState<string[]>([]);
 
-  const handleCorrectGuess = () => {
+  const advanceToNext = () => {
     const nextIndex = currentIndex + 1;
+    
     if (nextIndex < wordList.words.length) {
       if (nextIndex % 5 === 0) {
         setShowSentenceStep(true);
@@ -31,6 +33,15 @@ const Game: React.FC<GameProps> = ({ wordList, onGameOver, onQuit }) => {
     }
   };
 
+  const handleCorrectGuess = () => {
+    advanceToNext();
+  };
+
+  const handleSkipGuess = () => {
+    setSkippedWords(prev => [...prev, wordList.words[currentIndex].id]);
+    advanceToNext();
+  };
+
   const handleSentenceContinue = (sentence: string) => {
     console.log("Phrase créée :", sentence);
     setShowSentenceStep(false);
@@ -43,10 +54,11 @@ const Game: React.FC<GameProps> = ({ wordList, onGameOver, onQuit }) => {
 
   const progressPercent = ((currentIndex) / wordList.words.length) * 100;
   
-  const guessedWords = wordList.words.slice(0, currentIndex);
+  const allPlayedWords = wordList.words.slice(0, currentIndex);
+  const foundWordsCount = allPlayedWords.filter(w => !skippedWords.includes(w.id)).length;
 
   if (showSentenceStep) {
-    const recentWords = wordList.words.slice(currentIndex - 5, currentIndex);
+    const recentWords = allPlayedWords.slice(-5);
     return (
       <div className="glass-panel game-container">
         <div className="game-header">
@@ -86,23 +98,27 @@ const Game: React.FC<GameProps> = ({ wordList, onGameOver, onQuit }) => {
         key={currentWord.id} // Re-mount component on new word
         wordItem={currentWord} 
         onCorrectGuess={handleCorrectGuess} 
+        onSkipGuess={handleSkipGuess}
       />
       </div>
 
       <div className="guessed-floating-btn-container">
         {showPopover && (
           <div className="guessed-popover glass-panel">
-            <h4>Mots devinés ({guessedWords.length})</h4>
-            {guessedWords.length === 0 ? (
-              <p style={{ margin: 0, color: 'var(--text-muted)' }}>Aucun mot deviné pour le moment.</p>
+            <h4>Mots devinés ({foundWordsCount})</h4>
+            {allPlayedWords.length === 0 ? (
+              <p style={{ margin: 0, color: 'var(--text-muted)' }}>Aucun mot joué pour le moment.</p>
             ) : (
               <ul className="guessed-list">
-                {guessedWords.map((item, idx) => (
-                  <li key={item.id}>
-                    <span style={{ color: 'var(--text-muted)', marginRight: '8px' }}>{idx + 1}.</span> 
-                    {item.word}
-                  </li>
-                ))}
+                {allPlayedWords.map((item, idx) => {
+                  const isSkipped = skippedWords.includes(item.id);
+                  return (
+                    <li key={item.id} className={isSkipped ? 'skipped-word' : ''}>
+                      <span style={{ color: 'var(--text-muted)', marginRight: '8px' }}>{idx + 1}.</span> 
+                      {item.word} {isSkipped && '❌'}
+                    </li>
+                  )
+                })}
               </ul>
             )}
           </div>
@@ -111,10 +127,10 @@ const Game: React.FC<GameProps> = ({ wordList, onGameOver, onQuit }) => {
         <button 
           className="guessed-floating-btn"
           onClick={() => setShowPopover(!showPopover)}
-          title={`${guessedWords.length} mot(s) deviné(s)`}
+          title={`${foundWordsCount} mot(s) deviné(s)`}
         >
           🏆
-          <span className="badge">{guessedWords.length}</span>
+          <span className="badge">{foundWordsCount}</span>
         </button>
       </div>
     </>
