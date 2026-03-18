@@ -60,7 +60,7 @@ const WordGuess: React.FC<WordGuessProps> = ({ wordItem, onCorrectGuess, onSkipG
         <div className="revealed-word-text">{wordItem.word}</div>
         <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem' }}>L'aviez-vous trouvé par vous-même ?</p>
         <div className="action-buttons">
-          <button className="submit-btn" onClick={onCorrectGuess}>
+          <button className="found-btn" onClick={onCorrectGuess}>
             Oui, trouvé !
           </button>
           <button className="skip-btn" onClick={onSkipGuess}>

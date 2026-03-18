@@ -29,8 +29,8 @@
 }
 
 .list-card {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.6);
   border-radius: 16px;
   padding: 1.5rem;
   cursor: pointer;
@@ -38,10 +38,10 @@
 }
 
 .list-card:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.7);
   transform: translateY(-6px);
-  border-color: rgba(255, 255, 255, 0.3);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  border-color: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 10px 20px rgba(31, 38, 135, 0.05);
 }
 
 .list-card.selected {
@@ -82,10 +82,10 @@
 .progress-bar-container {
   width: 100%;
   height: 8px;
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(0, 0, 0, 0.05);
   border-radius: 8px;
   overflow: hidden;
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .progress-bar-fill {
@@ -113,8 +113,8 @@
 }
 
 .quit-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--text-main);
   box-shadow: none;
 }
 
@@ -146,7 +146,7 @@
 }
 
 .reveal-btn {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.4);
   color: var(--primary-color);
   border: 1px dashed var(--primary-color);
   box-shadow: none;
@@ -174,10 +174,10 @@
   width: 100%;
   padding: 1.2rem 1.5rem;
   font-size: 1.3rem;
-  background: rgba(0, 0, 0, 0.25);
+  background: rgba(255, 255, 255, 0.6);
   border: 2px solid var(--glass-border);
   border-radius: 12px;
-  color: white;
+  color: var(--text-main);
   font-family: inherit;
   transition: all 0.3s ease;
   outline: none;
@@ -185,12 +185,12 @@
 
 .guess-input:focus {
   border-color: var(--primary-color);
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(255, 255, 255, 0.9);
   box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2);
 }
 
 .guess-input::placeholder {
-  color: rgba(255, 255, 255, 0.3);
+  color: rgba(0, 0, 0, 0.4);
 }
 
 .submit-btn {
@@ -235,12 +235,12 @@
   width: 65px;
   height: 65px;
   border-radius: 50%;
-  border: 2px solid rgba(255, 255, 255, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
   font-size: 1.5rem;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 8px 25px rgba(31, 38, 135, 0.15);
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   position: relative;
@@ -250,7 +250,7 @@
 .guessed-floating-btn:hover {
   transform: scale(1.1) translateY(-5px);
   background: var(--primary-hover);
-  box-shadow: 0 12px 30px rgba(99, 102, 241, 0.6);
+  box-shadow: 0 12px 30px rgba(99, 102, 241, 0.3);
 }
 
 .guessed-floating-btn .badge {
@@ -339,7 +339,7 @@
 .reveal-word-btn {
   background: transparent;
   color: var(--text-muted);
-  border: 1px dashed rgba(255, 255, 255, 0.3);
+  border: 1px dashed rgba(0, 0, 0, 0.2);
   padding: 0.8rem;
   border-radius: 12px;
   cursor: pointer;
@@ -349,9 +349,9 @@
 }
 
 .reveal-word-btn:hover {
-  border-color: rgba(255, 255, 255, 0.6);
-  color: white;
-  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(0, 0, 0, 0.4);
+  color: var(--text-main);
+  background: rgba(0, 0, 0, 0.05);
 }
 
 .revealed-word-text {
@@ -375,6 +375,20 @@
 
 .action-buttons button {
   flex: 1;
+}
+
+.found-btn {
+  background: var(--success-color);
+  box-shadow: 0 4px 14px rgba(22, 163, 74, 0.3);
+  padding: 1.2rem;
+  font-size: 1.2rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.found-btn:hover {
+  background: #15803d;
+  box-shadow: 0 6px 20px rgba(22, 163, 74, 0.4);
 }
 
 .skip-btn {
@@ -435,14 +449,14 @@
 }
 
 .word-pill.unselected {
-  background: rgba(255, 255, 255, 0.05);
-  color: rgba(255, 255, 255, 0.4);
+  background: rgba(0, 0, 0, 0.05);
+  color: rgba(0, 0, 0, 0.5);
   filter: grayscale(100%);
 }
 
 .word-pill.unselected:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.9);
+  background: rgba(0, 0, 0, 0.1);
+  color: rgba(0, 0, 0, 0.9);
   transform: translateY(-2px);
 }
 
@@ -450,10 +464,10 @@
   width: 100%;
   padding: 1.5rem;
   font-size: 1.2rem;
-  background: rgba(0, 0, 0, 0.25);
+  background: rgba(255, 255, 255, 0.6);
   border: 2px solid var(--glass-border);
   border-radius: 12px;
-  color: white;
+  color: var(--text-main);
   font-family: inherit;
   resize: vertical;
   outline: none;
@@ -462,6 +476,6 @@
 
 .sentence-input:focus {
   border-color: var(--primary-color);
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(255, 255, 255, 0.9);
   box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2);
 }
