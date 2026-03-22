@@ -14,18 +14,12 @@ const WordGuess: React.FC<WordGuessProps> = ({ wordItem, onCorrectGuess, onSkipG
   const [isRevealed, setIsRevealed] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Reset state when the word changes
+  // Focus the input on mount
   useEffect(() => {
-    setCluesRevealed(1);
-    setGuess('');
-    setIsError(false);
-    setIsRevealed(false);
-    
-    // Focus the input to keep the flow smooth
     if (inputRef.current) {
       inputRef.current.focus();
     }
-  }, [wordItem]);
+  }, []);
 
   const handleRevealClue = () => {
     if (cluesRevealed < 3) {

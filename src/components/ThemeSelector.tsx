@@ -1,12 +1,12 @@
 import React from 'react';
 import type { WordList } from '../data/wordLists';
 
-type HomeProps = {
+type ThemeSelectorProps = {
   lists: WordList[];
   onStartGame: (list: WordList) => void;
 };
 
-const Home: React.FC<HomeProps> = ({ lists, onStartGame }) => {
+const ThemeSelector: React.FC<ThemeSelectorProps> = ({ lists, onStartGame }) => {
   return (
     <div className="glass-panel home-container">
       <h2>Choisissez un thème pour commencer</h2>
@@ -27,4 +27,4 @@ const Home: React.FC<HomeProps> = ({ lists, onStartGame }) => {
   );
 };
 
-export default Home;
+export default ThemeSelector;
