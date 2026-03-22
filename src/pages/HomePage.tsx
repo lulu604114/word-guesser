@@ -16,7 +16,19 @@ const HomePage: React.FC = () => {
           <div 
             className="list-card"
             onClick={() => navigate('/word-guesser')}
+            style={{ position: 'relative' }}
           >
+            <span 
+              className="settings-icon"
+              onClick={(e) => {
+                e.stopPropagation();
+                navigate('/setup/word-guesser');
+              }}
+              style={{ position: 'absolute', top: '10px', right: '10px', fontSize: '1.5rem', cursor: 'pointer', zIndex: 10, padding: '5px' }}
+              title="Paramètres du jeu"
+            >
+              ⚙️
+            </span>
             <h3>Devinettes</h3>
             <p>Jeu de devinettes de mots avec des indices.</p>
           </div>

@@ -6,9 +6,8 @@ import ThemeSelector from '../components/ThemeSelector';
 import Game from '../components/Game';
 import GameOver from '../components/GameOver';
 import AppHeader from '../components/AppHeader';
-import ManageWords from '../components/ManageWords';
 
-type AppState = 'HOME' | 'PLAYING' | 'GAME_OVER' | 'MANAGE_WORDS';
+type AppState = 'HOME' | 'PLAYING' | 'GAME_OVER';
 
 function WordGuesserApp() {
   const [appState, setAppState] = useState<AppState>('HOME');
@@ -51,22 +50,7 @@ function WordGuesserApp() {
                 lists={wordLists}
                 onStartGame={startGame}
               />
-              <button
-                className="manage-btn primary-btn"
-                onClick={() => setAppState('MANAGE_WORDS')}
-                style={{ marginTop: '2rem', backgroundColor: '#646cff' }}
-              >
-                Gérer les Mots et Thèmes
-              </button>
             </div>
-          )}
-
-          {appState === 'MANAGE_WORDS' && (
-            <ManageWords
-              wordLists={wordLists}
-              onBack={() => setAppState('HOME')}
-              onDataChanged={loadLists}
-            />
           )}
 
           {appState === 'PLAYING' && selectedList && (

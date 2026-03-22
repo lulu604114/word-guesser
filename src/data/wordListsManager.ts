@@ -115,3 +115,21 @@ export const addTheme = async (shortId: string, title: string) => {
   if (error) throw error;
   return data;
 };
+
+export const updateTheme = async (themeDbId: string, shortId: string, title: string) => {
+  const { error } = await supabase
+    .from('themes')
+    .update({ short_id: shortId, title })
+    .eq('id', themeDbId);
+    
+  if (error) throw error;
+};
+
+export const deleteTheme = async (themeDbId: string) => {
+  const { error } = await supabase
+    .from('themes')
+    .delete()
+    .eq('id', themeDbId);
+    
+  if (error) throw error;
+};
