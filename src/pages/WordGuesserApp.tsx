@@ -4,6 +4,7 @@ import { type WordList, defaultWordLists } from '../data/wordLists';
 import ThemeSelector from '../components/ThemeSelector';
 import Game from '../components/Game';
 import GameOver from '../components/GameOver';
+import AppHeader from '../components/AppHeader';
 
 type AppState = 'HOME' | 'PLAYING' | 'GAME_OVER';
 
@@ -27,27 +28,27 @@ function WordGuesserApp() {
 
   return (
     <div className="app-container">
-      <h1 className="title">Devinettes</h1>
-      
+      <AppHeader title="Devinettes" />
+
       {appState === 'HOME' && (
-        <ThemeSelector 
-          lists={defaultWordLists} 
-          onStartGame={startGame} 
+        <ThemeSelector
+          lists={defaultWordLists}
+          onStartGame={startGame}
         />
       )}
-      
+
       {appState === 'PLAYING' && selectedList && (
-        <Game 
-          wordList={selectedList} 
-          onGameOver={handleGameOver} 
+        <Game
+          wordList={selectedList}
+          onGameOver={handleGameOver}
           onQuit={playAgain}
         />
       )}
-      
+
       {appState === 'GAME_OVER' && selectedList && (
-        <GameOver 
-          wordList={selectedList} 
-          onPlayAgain={playAgain} 
+        <GameOver
+          wordList={selectedList}
+          onPlayAgain={playAgain}
         />
       )}
     </div>
