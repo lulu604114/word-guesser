@@ -1,20 +1,22 @@
 import { useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
+import {
+  Box, Button, Flex, Heading, IconButton, Table, Thead, Tbody, Tr, Th, Td, TableContainer,
+  Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton,
+  FormControl, FormLabel, Input, useDisclosure, Text, Badge
+} from '@chakra-ui/react';
+import { AddIcon, EditIcon, DeleteIcon } from '@chakra-ui/icons';
 import { addTheme, updateTheme, deleteTheme, type DbWordList } from '../data/wordListsManager';
 import type { SetupContextType } from '../pages/WordGuesserSetup';
-import Dialog from './Dialog';
-import './ManageWords.css'; 
 
 export default function ManageThemes() {
   const { wordLists, loadLists } = useOutletContext<SetupContextType>();
-
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const [modalMode, setModalMode] = useState<'create' | 'edit'>('create');
-
+  
   const [formThemeDbId, setFormThemeDbId] = useState<string | null>(null);
   const [formShortId, setFormShortId] = useState('');
   const [formTitle, setFormTitle] = useState('');
-  
   const [isLoading, setIsLoading] = useState(false);
 
   const handleOpenCreate = () => {
@@ -22,15 +24,15 @@ export default function ManageThemes() {
     setFormThemeDbId(null);
     setFormShortId('');
     setFormTitle('');
-    setIsModalOpen(true);
+    onOpen();
   };
 
   const handleOpenEdit = (theme: DbWordList) => {
     setModalMode('edit');
     setFormThemeDbId(theme.db_id);
-    setFormShortId(theme.id); // mapped in wordLists
+    setFormShortId(theme.id);
     setFormTitle(theme.title);
-    setIsModalOpen(true);
+    onOpen();
   };
 
   const handleSaveTheme = async (e: React.FormEvent) => {
@@ -43,7 +45,7 @@ export default function ManageThemes() {
       } else if (formThemeDbId) {
         await updateTheme(formThemeDbId, formShortId, formTitle);
       }
-      setIsModalOpen(false);
+      onClose();
       loadLists();
     } catch (err) {
       console.error(err);
@@ -68,77 +70,89 @@ export default function ManageThemes() {
   };
 
   return (
-    <div className="manage-form-section">
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-        <h3 style={{ margin: 0, borderBottom: 'none', paddingBottom: 0 }}>Thèmes</h3>
-        <button className="icon-btn" onClick={handleOpenCreate} title="Ajouter un nouveau thème" style={{ background: 'linear-gradient(135deg, var(--primary-color), #818cf8)', color: 'white', padding: '0.6rem', borderRadius: '12px', boxShadow: '0 4px 15px rgba(99, 102, 241, 0.3)' }}>
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <line x1="12" y1="5" x2="12" y2="19"></line>
-            <line x1="5" y1="12" x2="19" y2="12"></line>
-          </svg>
-        </button>
-      </div>
+    <Box layerStyle="glass">
+      <Flex justify="space-between" align="center" mb={6}>
+        <Heading as="h3" size="lg" color="brand.600">Thèmes</Heading>
+        <IconButton 
+          aria-label="Ajouter un thème" 
+          icon={<AddIcon />} 
+          colorScheme="brand" 
+          onClick={handleOpenCreate} 
+          borderRadius="12px"
+        />
+      </Flex>
       
-      <div className="words-list" style={{ marginTop: '0', marginBottom: '2rem' }}>
-        {wordLists.length === 0 && <p>Aucun thème pour le moment.</p>}
-        {wordLists.length > 0 && (
-          <div style={{ overflowX: 'auto' }}>
-            <table className="words-table">
-              <thead>
-                <tr>
-                  <th>Titre du Thème</th>
-                  <th>ID Court</th>
-                  <th style={{ textAlign: 'center' }}>Mots Associés</th>
-                  <th style={{ textAlign: 'right' }}>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {wordLists.map(theme => (
-                  <tr key={theme.db_id}>
-                    <td style={{ fontWeight: 'bold', color: 'var(--primary-color)', fontSize: '1.1rem' }}>{theme.title}</td>
-                    <td style={{ color: 'var(--text-muted)' }}>{theme.id}</td>
-                    <td style={{ textAlign: 'center', fontWeight: 'bold' }}>
-                      <span style={{ background: 'rgba(99, 102, 241, 0.1)', color: 'var(--primary-color)', padding: '0.4rem 0.8rem', borderRadius: '20px' }}>
-                        {theme.words.length} mots
-                      </span>
-                    </td>
-                    <td style={{ textAlign: 'right' }}>
-                      <div className="word-actions-inline">
-                        <button className="icon-btn edit-icon-btn" onClick={() => handleOpenEdit(theme)} title="Modifier ce thème">✏️</button>
-                        <button className="icon-btn delete-icon-btn" onClick={() => handleDeleteTheme(theme.db_id)} title="Supprimer ce thème">🗑️</button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
+      {wordLists.length === 0 ? (
+        <Text color="gray.500">Aucun thème pour le moment.</Text>
+      ) : (
+        <TableContainer bg="rgba(255, 255, 255, 0.4)" borderRadius="16px" border="1px solid var(--chakra-colors-whiteAlpha-600)" shadow="sm" overflowX="auto">
+          <Table variant="simple" size={{ base: 'sm', md: 'md' }}>
+            <Thead bg="brand.50">
+              <Tr>
+                <Th>Titre</Th>
+                <Th display={{ base: 'none', md: 'table-cell' }}>ID Court</Th>
+                <Th textAlign="center">Mots</Th>
+                <Th textAlign="right">Actions</Th>
+              </Tr>
+            </Thead>
+            <Tbody>
+              {wordLists.map(theme => (
+                <Tr key={theme.db_id} _hover={{ bg: 'whiteAlpha.700' }}>
+                  <Td fontWeight="bold" color="brand.600" fontSize={{ base: 'md', md: 'lg' }}>{theme.title}</Td>
+                  <Td display={{ base: 'none', md: 'table-cell' }} color="gray.500">{theme.id}</Td>
+                  <Td textAlign="center">
+                    <Badge colorScheme="brand" px={3} py={1} borderRadius="full">
+                      {theme.words.length} mots
+                    </Badge>
+                  </Td>
+                  <Td textAlign="right">
+                    <Flex gap={2} justify="flex-end">
+                      <IconButton aria-label="Éditer" icon={<EditIcon />} size="sm" variant="ghost" colorScheme="brand" onClick={() => handleOpenEdit(theme)} />
+                      <IconButton aria-label="Supprimer" icon={<DeleteIcon />} size="sm" variant="ghost" colorScheme="red" onClick={() => handleDeleteTheme(theme.db_id)} />
+                    </Flex>
+                  </Td>
+                </Tr>
+              ))}
+            </Tbody>
+          </Table>
+        </TableContainer>
+      )}
 
-      <Dialog 
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        title={modalMode === 'create' ? 'Ajouter un thème' : 'Modifier le thème'}
-      >
-        <form onSubmit={handleSaveTheme} className="add-theme-form">
-          <label style={{marginTop: '0.5rem', fontSize: '1rem', color: 'var(--text-muted)'}}>Identifiant court :</label>
-          <input 
-            type="text" placeholder="ID court (ex: sports)" 
-            value={formShortId} onChange={e => setFormShortId(e.target.value)} 
-            required 
-          />
-          <label style={{marginTop: '1rem', fontSize: '1rem', color: 'var(--text-muted)'}}>Titre complet :</label>
-          <input 
-            type="text" placeholder="Titre (ex: Les Sports)" 
-            value={formTitle} onChange={e => setFormTitle(e.target.value)} 
-            required 
-          />
-          <button type="submit" disabled={isLoading} className="add-action-btn" style={{marginTop: '1.5rem'}}>
-            {modalMode === 'create' ? 'Créer le thème' : 'Sauvegarder les modifications'}
-          </button>
-        </form>
-      </Dialog>
-    </div>
+      <Modal isOpen={isOpen} onClose={onClose} isCentered>
+        <ModalOverlay backdropFilter="blur(5px)" bg="blackAlpha.300" />
+        <ModalContent layerStyle="glass" p={0} m={4}>
+          <form onSubmit={handleSaveTheme}>
+            <ModalHeader color="brand.600">{modalMode === 'create' ? 'Ajouter un thème' : 'Modifier le thème'}</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody pb={6}>
+              <FormControl isRequired mb={4}>
+                <FormLabel>Identifiant court</FormLabel>
+                <Input 
+                  placeholder="ex: sports" 
+                  value={formShortId} 
+                  onChange={e => setFormShortId(e.target.value)} 
+                  variant="glass"
+                />
+              </FormControl>
+              <FormControl isRequired>
+                <FormLabel>Titre complet</FormLabel>
+                <Input 
+                  placeholder="ex: Les Sports" 
+                  value={formTitle} 
+                  onChange={e => setFormTitle(e.target.value)} 
+                  variant="glass"
+                />
+              </FormControl>
+            </ModalBody>
+            <ModalFooter>
+              <Button onClick={onClose} mr={3} variant="ghost">Annuler</Button>
+              <Button type="submit" colorScheme="brand" isLoading={isLoading}>
+                {modalMode === 'create' ? 'Créer' : 'Sauvegarder'}
+              </Button>
+            </ModalFooter>
+          </form>
+        </ModalContent>
+      </Modal>
+    </Box>
   );
 }

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Box, Button, Flex, FormControl, FormLabel, Heading, Input, VStack } from '@chakra-ui/react';
 import { supabase } from '../supabaseClient';
 import AppHeader from '../components/AppHeader';
 
@@ -24,73 +25,69 @@ const LoginPage: React.FC = () => {
       setError(error.message);
       setIsLoading(false);
     } else {
-      // Redirect to setup on success
       navigate('/setup/word-guesser');
     }
   };
 
   return (
-    <div className="app-container">
+    <Flex direction="column" align="center" justify="center" w="100%" p={8} maxW="1280px" mx="auto">
       <AppHeader title="Connexion Administrateur" />
-      <div className="glass-panel" style={{ marginTop: '2rem', width: '100%', maxWidth: '400px' }}>
-        <h2 style={{ marginBottom: '1.5rem', color: 'var(--primary-color)' }}>Accès restreint</h2>
+      <Box layerStyle="glass" w="100%" maxW="400px" mt={8}>
+        <Heading as="h2" size="lg" mb={6} color="brand.600">Accès restreint</Heading>
         
         {error && (
-          <div style={{ 
-            color: 'var(--error-color)', 
-            background: 'rgba(239, 68, 68, 0.1)', 
-            padding: '1rem', 
-            borderRadius: '12px',
-            marginBottom: '1.5rem',
-            border: '1px solid rgba(239, 68, 68, 0.3)'
-          }}>
+          <Box 
+            color="error.500" 
+            bg="rgba(239, 68, 68, 0.1)" 
+            p={4} 
+            borderRadius="12px"
+            mb={6}
+            border="1px solid rgba(239, 68, 68, 0.3)"
+          >
             {error}
-          </div>
+          </Box>
         )}
         
-        <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', textAlign: 'left' }}>
-            <label htmlFor="email" style={{ fontWeight: 600, color: 'var(--text-muted)', fontSize: '1rem' }}>Adresse email</label>
-            <input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="guess-input"
-              placeholder="admin@example.com"
-            />
-          </div>
-          
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', textAlign: 'left' }}>
-            <label htmlFor="password" style={{ fontWeight: 600, color: 'var(--text-muted)', fontSize: '1rem' }}>Mot de passe</label>
-            <input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              className="guess-input"
-              placeholder="••••••••"
-            />
-          </div>
-          
-          <button 
-            type="submit" 
-            disabled={isLoading}
-            style={{ 
-              marginTop: '0.5rem', 
-              padding: '1.2rem', 
-              fontSize: '1.1rem',
-              letterSpacing: '0.05em',
-              textTransform: 'uppercase'
-            }}
-          >
-            {isLoading ? 'Connexion en cours...' : 'Se connecter'}
-          </button>
+        <form onSubmit={handleLogin}>
+          <VStack spacing={4} align="stretch">
+            <FormControl isRequired>
+              <FormLabel color="gray.600" fontWeight="600">Adresse email</FormLabel>
+              <Input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                variant="glass"
+                placeholder="admin@example.com"
+              />
+            </FormControl>
+            
+            <FormControl isRequired>
+              <FormLabel color="gray.600" fontWeight="600">Mot de passe</FormLabel>
+              <Input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                variant="glass"
+                placeholder="••••••••"
+              />
+            </FormControl>
+            
+            <Button 
+              type="submit" 
+              colorScheme="brand" 
+              isLoading={isLoading}
+              loadingText="Connexion..."
+              mt={4} 
+              size="lg"
+              textTransform="uppercase"
+              letterSpacing="0.05em"
+            >
+              Se connecter
+            </Button>
+          </VStack>
         </form>
-      </div>
-    </div>
+      </Box>
+    </Flex>
   );
 };
 

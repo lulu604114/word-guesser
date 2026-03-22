@@ -1,41 +1,59 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import '../App.css';
+import { Box, Heading, Text, SimpleGrid, Flex, IconButton } from '@chakra-ui/react';
+import { SettingsIcon } from '@chakra-ui/icons';
 
 const HomePage: React.FC = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="app-container">
-      <h1 className="title">Jeux Disponibles</h1>
+    <Flex direction="column" align="center" justify="center" w="100%" p={8}>
+      <Heading 
+        as="h1" 
+        fontSize={{ base: '2.5rem', md: '3.5rem' }} 
+        mb={8} 
+        bgGradient="linear(to-br, #a5b4fc, #818cf8)" 
+        bgClip="text" 
+        textShadow="0 4px 12px rgba(99, 102, 241, 0.2)"
+      >
+        Jeux Disponibles
+      </Heading>
       
-      <div className="glass-panel home-container">
-        <h2>Choisissez un jeu pour commencer</h2>
+      <Box layerStyle="glass" w="100%" maxW="600px">
+        <Heading as="h2" size="md" mb={6} color="gray.500" textAlign="center">
+          Choisissez un jeu pour commencer
+        </Heading>
         
-        <div className="list-grid">
-          <div 
-            className="list-card"
+        <SimpleGrid columns={{ base: 1, sm: 2 }} spacing={6}>
+          <Box 
+            layerStyle="card"
             onClick={() => navigate('/word-guesser')}
-            style={{ position: 'relative' }}
+            position="relative"
           >
-            <span 
-              className="settings-icon"
+            <IconButton
+              aria-label="Paramètres du jeu"
+              icon={<SettingsIcon />}
+              position="absolute"
+              top={2}
+              right={2}
+              size="sm"
+              variant="ghost"
+              colorScheme="brand"
               onClick={(e) => {
                 e.stopPropagation();
                 navigate('/setup/word-guesser');
               }}
-              style={{ position: 'absolute', top: '10px', right: '10px', fontSize: '1.5rem', cursor: 'pointer', zIndex: 10, padding: '5px' }}
-              title="Paramètres du jeu"
-            >
-              ⚙️
-            </span>
-            <h3>Devinettes</h3>
-            <p>Jeu de devinettes de mots avec des indices.</p>
-          </div>
-          {/* Add more games here in the future */}
-        </div>
-      </div>
-    </div>
+            />
+            <Heading as="h3" size="md" mb={2} color="gray.800">
+              Devinettes
+            </Heading>
+            <Text color="gray.500" fontSize="sm">
+              Jeu de devinettes de mots avec des indices.
+            </Text>
+          </Box>
+        </SimpleGrid>
+      </Box>
+    </Flex>
   );
 };
 

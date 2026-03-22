@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Box, Button, Text, Textarea, Flex, Wrap, WrapItem } from '@chakra-ui/react';
 import type { WordItem } from '../data/wordLists';
 
 type SentenceStepProps = {
@@ -19,41 +20,55 @@ const SentenceStep: React.FC<SentenceStepProps> = ({ words, onContinue }) => {
   };
 
   return (
-    <div className="sentence-step-container">
-      <h3 style={{ color: 'var(--text-main)', marginBottom: '0.5rem' }}>À vous de jouer !</h3>
-      <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem', fontSize: '1.05rem' }}>
-        Sélectionnez au moins un mot ci-dessous et écrivez une phrase originale qui l'utilise.
-      </p>
+    <Box>
+      <Box mb={6} textAlign="center">
+        <Text fontSize="2xl" fontWeight="bold" color="brand.600" mb={2}>À vous de jouer !</Text>
+        <Text color="gray.600" fontSize="lg">
+          Sélectionnez au moins un mot ci-dessous et écrivez une phrase originale qui l'utilise.
+        </Text>
+      </Box>
       
-      <div className="word-pills">
+      <Wrap spacing={3} justify="center" mb={6}>
         {words.map(w => (
-          <button 
-            key={w.id}
-            className={`word-pill ${selectedWords.includes(w.word) ? 'selected' : 'unselected'}`}
-            onClick={() => toggleWord(w.word)}
-          >
-            {w.word}
-          </button>
+          <WrapItem key={w.id}>
+            <Button 
+              size="md"
+              borderRadius="full"
+              variant={selectedWords.includes(w.word) ? "solid" : "outline"}
+              colorScheme={selectedWords.includes(w.word) ? "brand" : "gray"}
+              onClick={() => toggleWord(w.word)}
+              bg={selectedWords.includes(w.word) ? undefined : "whiteAlpha.500"}
+              px={6}
+            >
+              {w.word}
+            </Button>
+          </WrapItem>
         ))}
-      </div>
+      </Wrap>
 
-      <textarea 
-        className="sentence-input"
+      <Textarea 
+        variant="glass"
         placeholder="Écrivez votre phrase ici..."
         value={sentence}
         onChange={(e) => setSentence(e.target.value)}
         rows={4}
+        size="lg"
+        mb={6}
       />
 
-      <button 
-        className="submit-btn" 
-        style={{ marginTop: '1.5rem' }}
-        onClick={() => onContinue(sentence)}
-        disabled={selectedWords.length === 0 || sentence.trim() === ''}
-      >
-        Continuer la partie
-      </button>
-    </div>
+      <Flex justify="center">
+        <Button 
+          size="lg"
+          colorScheme="brand" 
+          onClick={() => onContinue(sentence)}
+          isDisabled={selectedWords.length === 0 || sentence.trim() === ''}
+          px={10}
+          borderRadius="full"
+        >
+          Continuer la partie
+        </Button>
+      </Flex>
+    </Box>
   );
 };
 

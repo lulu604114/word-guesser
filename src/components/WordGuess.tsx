@@ -1,5 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { Box, Button, Flex, Input, Text, VStack } from '@chakra-ui/react';
+import { keyframes } from '@emotion/react';
 import type { WordItem } from '../data/wordLists';
+
+const shakeAnimation = keyframes`
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  50% { transform: translateX(5px); }
+  75% { transform: translateX(-5px); }
+  100% { transform: translateX(0); }
+`;
 
 type WordGuessProps = {
   wordItem: WordItem;
@@ -14,7 +24,6 @@ const WordGuess: React.FC<WordGuessProps> = ({ wordItem, onCorrectGuess, onSkipG
   const [isRevealed, setIsRevealed] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Focus the input on mount
   useEffect(() => {
     if (inputRef.current) {
       inputRef.current.focus();
@@ -32,80 +41,100 @@ const WordGuess: React.FC<WordGuessProps> = ({ wordItem, onCorrectGuess, onSkipG
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Clean strings for comparison (remove spaces, lowercase, accents)
     const normalize = (str: string) => 
       str.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
     if (normalize(guess) === normalize(wordItem.word)) {
       onCorrectGuess();
     } else {
-      // Trigger error animation
       setIsError(true);
-      setTimeout(() => setIsError(false), 500); // Remove class after animation
+      setTimeout(() => setIsError(false), 500);
     }
   };
 
   if (isRevealed) {
     return (
-      <div className="word-guess-container word-revealed-panel" style={{ textAlign: 'center' }}>
-        <h3 style={{ color: 'var(--text-main)', marginBottom: '0.5rem' }}>Découverte du mot</h3>
-        <p style={{ color: 'var(--text-muted)' }}>Le mot à trouver était :</p>
-        <div className="revealed-word-text">{wordItem.word}</div>
-        <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem' }}>L'aviez-vous trouvé par vous-même ?</p>
-        <div className="action-buttons">
-          <button className="found-btn" onClick={onCorrectGuess}>
-            Oui, trouvé !
-          </button>
-          <button className="skip-btn" onClick={onSkipGuess}>
-            Pas trouvé
-          </button>
-        </div>
-      </div>
+      <VStack spacing={6} p={4} textAlign="center">
+        <Box>
+          <Text fontSize="xl" fontWeight="bold" color="brand.600" mb={1}>Découverte du mot</Text>
+          <Text color="gray.500">Le mot à trouver était :</Text>
+        </Box>
+        <Text fontSize="3xl" fontWeight="black" color="brand.500" letterSpacing="widest" textTransform="uppercase">
+          {wordItem.word}
+        </Text>
+        <Box w="100%">
+          <Text color="gray.500" mb={4}>L'aviez-vous trouvé par vous-même ?</Text>
+          <Flex gap={4} justify="center" direction={{ base: 'column', sm: 'row' }}>
+            <Button colorScheme="green" size="lg" onClick={onCorrectGuess} borderRadius="full" px={8}>
+              Oui, trouvé !
+            </Button>
+            <Button colorScheme="red" variant="outline" size="lg" onClick={onSkipGuess} borderRadius="full" px={8}>
+              Pas trouvé
+            </Button>
+          </Flex>
+        </Box>
+      </VStack>
     );
   }
 
   return (
-    <div className="word-guess-container">
-      <div className="clues-container">
+    <Box>
+      <VStack spacing={3} align="stretch" mb={cluesRevealed < wordItem.clues.length ? 4 : 8}>
         {wordItem.clues.slice(0, cluesRevealed).map((clue, index) => (
-          <div key={index} className="clue-box">
-            <span className="clue-label">Indice {index + 1}</span>
-            {clue}
-          </div>
+          <Box key={index} p={4} bg="brand.50" borderRadius="12px" borderLeft="4px solid" borderColor="brand.500">
+            <Text fontSize="xs" fontWeight="bold" color="brand.400" textTransform="uppercase" mb={1}>
+              Indice {index + 1}
+            </Text>
+            <Text color="gray.700" fontSize="lg">{clue}</Text>
+          </Box>
         ))}
-      </div>
+      </VStack>
 
       {cluesRevealed < wordItem.clues.length && (
-        <button 
-          className="reveal-btn" 
+        <Button 
+          variant="ghost" 
+          colorScheme="brand" 
           onClick={handleRevealClue}
-          style={{ marginBottom: '2rem' }}
+          mb={8}
+          w="100%"
+          borderStyle="dashed"
+          borderWidth="2px"
+          borderColor="brand.200"
         >
           + Révéler un indice
-        </button>
+        </Button>
       )}
 
-      <form onSubmit={handleSubmit} className="guess-form">
-        <div className="input-group">
-          <input
+      <form onSubmit={handleSubmit}>
+        <Flex gap={2} mb={4} direction={{ base: 'column', sm: 'row' }}>
+          <Input
             ref={inputRef}
-            type="text"
+            variant="glass"
+            size="lg"
             value={guess}
             onChange={(e) => setGuess(e.target.value)}
             placeholder="Entrez votre réponse..."
-            className={`guess-input ${isError ? 'shake' : ''}`}
             autoComplete="off"
+            animation={isError ? `${shakeAnimation} 0.5s ease-in-out` : undefined}
+            borderColor={isError ? "red.400" : "whiteAlpha.400"}
+            _focus={{ borderColor: isError ? "red.400" : "brand.500" }}
           />
-          <button type="submit" className="submit-btn input-submit-btn" disabled={!guess.trim()}>
+          <Button type="submit" colorScheme="brand" size="lg" px={8} disabled={!guess.trim()}>
             Valider
-          </button>
-        </div>
-        <button type="button" className="reveal-word-btn" onClick={() => setIsRevealed(true)}>
+          </Button>
+        </Flex>
+        <Button 
+          type="button" 
+          variant="link" 
+          colorScheme="gray" 
+          size="sm" 
+          w="100%" 
+          onClick={() => setIsRevealed(true)}
+        >
           Découvrir le mot
-        </button>
+        </Button>
       </form>
-    </div>
+    </Box>
   );
 };
 

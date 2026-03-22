@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { Box, Flex, Text, Button, Progress, Popover, PopoverTrigger, PopoverContent, PopoverHeader, PopoverBody, PopoverArrow, PopoverCloseButton, Badge, List, ListItem, ListIcon } from '@chakra-ui/react';
+import { CheckCircleIcon, CloseIcon } from '@chakra-ui/icons';
 import type { WordList } from '../data/wordLists';
 import WordGuess from './WordGuess';
 import SentenceStep from './SentenceStep';
@@ -11,7 +13,6 @@ type GameProps = {
 
 const Game: React.FC<GameProps> = ({ wordList, onGameOver, onQuit }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [showPopover, setShowPopover] = useState(false);
   const [showSentenceStep, setShowSentenceStep] = useState(false);
   const [skippedWords, setSkippedWords] = useState<string[]>([]);
 
@@ -51,7 +52,7 @@ const Game: React.FC<GameProps> = ({ wordList, onGameOver, onQuit }) => {
   };
 
   const currentWord = wordList.words[currentIndex];
-
+  // Calculate Progress Percent - Fixed type arithmetic
   const progressPercent = ((currentIndex) / wordList.words.length) * 100;
   
   const allPlayedWords = wordList.words.slice(0, currentIndex);
@@ -60,80 +61,97 @@ const Game: React.FC<GameProps> = ({ wordList, onGameOver, onQuit }) => {
   if (showSentenceStep) {
     const recentWords = allPlayedWords.slice(-5);
     return (
-      <div className="glass-panel game-container">
-        <div className="game-header">
-          <div className="progress-wrapper">
-            <span className="progress-text">Création de phrase...</span>
-          </div>
-          <button className="quit-btn" onClick={onQuit}>
+      <Box layerStyle="glass">
+        <Flex justify="space-between" align="center" mb={6}>
+          <Text fontWeight="bold" color="brand.600">Création de phrase...</Text>
+          <Button variant="ghost" colorScheme="red" size="sm" onClick={onQuit}>
             Quitter la partie
-          </button>
-        </div>
+          </Button>
+        </Flex>
         <SentenceStep words={recentWords} onContinue={handleSentenceContinue} />
-      </div>
+      </Box>
     );
   }
 
   return (
-    <>
-      <div className="glass-panel game-container">
-      <div className="game-header">
-        <div className="progress-wrapper">
-          <div className="progress-text">
-            Mot {currentIndex + 1} sur {wordList.words.length}
-          </div>
-          <div className="progress-bar-container">
-            <div 
-              className="progress-bar-fill" 
-              style={{ width: `${progressPercent}%` }}
-            ></div>
-          </div>
-        </div>
-        <button className="quit-btn" onClick={onQuit}>
-          Quitter la partie
-        </button>
-      </div>
+    <Box position="relative">
+      <Box layerStyle="glass">
+        <Flex justify="space-between" align="center" mb={4}>
+          <Box flex="1" mr={4}>
+            <Text fontWeight="bold" color="brand.600" mb={2}>
+              Mot {currentIndex + 1} sur {wordList.words.length}
+            </Text>
+            <Progress value={progressPercent} size="sm" colorScheme="brand" borderRadius="full" bg="blackAlpha.200" />
+          </Box>
+          <Button variant="ghost" colorScheme="red" size="sm" onClick={onQuit}>
+            Quitter la partie
+          </Button>
+        </Flex>
 
-      <WordGuess 
-        key={currentWord.id} // Re-mount component on new word
-        wordItem={currentWord} 
-        onCorrectGuess={handleCorrectGuess} 
-        onSkipGuess={handleSkipGuess}
-      />
-      </div>
+        <WordGuess 
+          key={currentWord.id}
+          wordItem={currentWord} 
+          onCorrectGuess={handleCorrectGuess} 
+          onSkipGuess={handleSkipGuess}
+        />
+      </Box>
 
-      <div className="guessed-floating-btn-container">
-        {showPopover && (
-          <div className="guessed-popover glass-panel">
-            <h4>Mots devinés ({foundWordsCount})</h4>
-            {allPlayedWords.length === 0 ? (
-              <p style={{ margin: 0, color: 'var(--text-muted)' }}>Aucun mot joué pour le moment.</p>
-            ) : (
-              <ul className="guessed-list">
-                {allPlayedWords.map((item, idx) => {
-                  const isSkipped = skippedWords.includes(item.id);
-                  return (
-                    <li key={item.id} className={isSkipped ? 'skipped-word' : ''}>
-                      <span style={{ color: 'var(--text-muted)', marginRight: '8px' }}>{idx + 1}.</span> 
-                      {item.word} {isSkipped && '❌'}
-                    </li>
-                  )
-                })}
-              </ul>
-            )}
-          </div>
-        )}
-        
-        <button 
-          className="guessed-floating-btn"
-          onClick={() => setShowPopover(!showPopover)}
-          title={`${foundWordsCount} mot(s) deviné(s)`}
-        >
-          🏆
-          <span className="badge">{foundWordsCount}</span>
-        </button>
-      </div>
-    </>
+      <Box position="fixed" bottom={{ base: 4, md: 8 }} right={{ base: 4, md: 8 }} zIndex={10}>
+        <Popover placement="top-end">
+          <PopoverTrigger>
+            <Button 
+              size="lg" 
+              colorScheme="yellow" 
+              boxShadow="xl" 
+              borderRadius="full" 
+              w="64px" 
+              h="64px" 
+              fontSize="2xl"
+              position="relative"
+            >
+              🏆
+              <Badge 
+                position="absolute" 
+                top="-2" 
+                right="-2" 
+                colorScheme="red" 
+                borderRadius="full" 
+                fontSize="0.8em"
+                px={2}
+              >
+                {foundWordsCount}
+              </Badge>
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent layerStyle="glass" p={0} border="none" w="300px">
+            <PopoverArrow bg="rgba(255,255,255,0.7)" />
+            <PopoverCloseButton />
+            <PopoverHeader fontWeight="bold" color="brand.600" borderBottomWidth="0">
+              Mots devinés ({foundWordsCount})
+            </PopoverHeader>
+            <PopoverBody maxH="300px" overflowY="auto">
+              {allPlayedWords.length === 0 ? (
+                <Text color="gray.500" fontSize="sm">Aucun mot joué pour le moment.</Text>
+              ) : (
+                <List spacing={2}>
+                  {allPlayedWords.map((item) => {
+                    const isSkipped = skippedWords.includes(item.id);
+                    return (
+                      <ListItem key={item.id} color={isSkipped ? "gray.400" : "gray.700"}>
+                        <ListIcon as={isSkipped ? CloseIcon : CheckCircleIcon} color={isSkipped ? "red.400" : "green.500"} />
+                        <Text as="span" textDecoration={isSkipped ? "line-through" : "none"}>
+                          {item.word}
+                        </Text>
+                      </ListItem>
+                    )
+                  })}
+                </List>
+              )}
+            </PopoverBody>
+          </PopoverContent>
+        </Popover>
+      </Box>
+    </Box>
   );
 };
 

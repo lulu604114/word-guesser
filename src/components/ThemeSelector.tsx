@@ -1,4 +1,5 @@
 import React from 'react';
+import { Box, Heading, SimpleGrid, Text } from '@chakra-ui/react';
 import type { WordList } from '../data/wordLists';
 
 type ThemeSelectorProps = {
@@ -8,22 +9,28 @@ type ThemeSelectorProps = {
 
 const ThemeSelector: React.FC<ThemeSelectorProps> = ({ lists, onStartGame }) => {
   return (
-    <div className="glass-panel home-container">
-      <h2>Choisissez un thème pour commencer</h2>
+    <Box layerStyle="glass">
+      <Heading as="h2" size="md" mb={6} color="gray.500" textAlign="center">
+        Choisissez un thème pour commencer
+      </Heading>
       
-      <div className="list-grid">
+      <SimpleGrid columns={{ base: 1, sm: 2 }} spacing={6}>
         {lists.map((list) => (
-          <div 
+          <Box 
             key={list.id} 
-            className="list-card"
+            layerStyle="card"
             onClick={() => onStartGame(list)}
           >
-            <h3>{list.title}</h3>
-            <p>{list.words.length} mots à deviner</p>
-          </div>
+            <Heading as="h3" size="md" mb={2} color="brand.600">
+              {list.title}
+            </Heading>
+            <Text color="gray.600" fontSize="sm">
+              {list.words.length} mots à deviner
+            </Text>
+          </Box>
         ))}
-      </div>
-    </div>
+      </SimpleGrid>
+    </Box>
   );
 };
 
