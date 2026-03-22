@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import '../App.css';
 import type { WordList } from '../data/wordLists';
-import { fetchWordLists, type DbWordList } from '../data/wordListsManager';
+import { useWordLists } from '../hooks/useWordLists';
 import ThemeSelector from '../components/ThemeSelector';
 import Game from '../components/Game';
 import GameOver from '../components/GameOver';
@@ -13,28 +13,8 @@ type AppState = 'HOME' | 'PLAYING' | 'GAME_OVER' | 'MANAGE_WORDS';
 function WordGuesserApp() {
   const [appState, setAppState] = useState<AppState>('HOME');
   const [selectedList, setSelectedList] = useState<WordList | null>(null);
-  
-  const [wordLists, setWordLists] = useState<DbWordList[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
-  const loadLists = async () => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      const lists = await fetchWordLists();
-      setWordLists(lists);
-    } catch (err) {
-      console.error(err);
-      setError('Erreur lors du chargement des données.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    loadLists();
-  }, []);
+  const { wordLists, isLoading, error, loadLists } = useWordLists();
 
   const startGame = (list: WordList) => {
     setSelectedList(list);
@@ -71,8 +51,8 @@ function WordGuesserApp() {
                 lists={wordLists}
                 onStartGame={startGame}
               />
-              <button 
-                className="manage-btn primary-btn" 
+              <button
+                className="manage-btn primary-btn"
                 onClick={() => setAppState('MANAGE_WORDS')}
                 style={{ marginTop: '2rem', backgroundColor: '#646cff' }}
               >
@@ -82,8 +62,8 @@ function WordGuesserApp() {
           )}
 
           {appState === 'MANAGE_WORDS' && (
-            <ManageWords 
-              wordLists={wordLists} 
+            <ManageWords
+              wordLists={wordLists}
               onBack={() => setAppState('HOME')}
               onDataChanged={loadLists}
             />
