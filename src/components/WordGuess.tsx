@@ -22,7 +22,7 @@ const WordGuess: React.FC<WordGuessProps> = ({ wordItem, onCorrectGuess, onSkipG
   }, []);
 
   const handleRevealClue = () => {
-    if (cluesRevealed < 3) {
+    if (cluesRevealed < wordItem.clues.length) {
       setCluesRevealed(prev => prev + 1);
     }
     if (inputRef.current) {
@@ -76,7 +76,7 @@ const WordGuess: React.FC<WordGuessProps> = ({ wordItem, onCorrectGuess, onSkipG
         ))}
       </div>
 
-      {cluesRevealed < 3 && (
+      {cluesRevealed < wordItem.clues.length && (
         <button 
           className="reveal-btn" 
           onClick={handleRevealClue}
