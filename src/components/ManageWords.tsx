@@ -7,13 +7,13 @@ import {
 } from '@chakra-ui/react';
 import { AddIcon, EditIcon, DeleteIcon, CloseIcon, InfoIcon } from '@chakra-ui/icons';
 import { addWordToTheme, updateWord, deleteWord } from '../data/wordListsManager';
-import type { SetupContextType } from '../pages/WordGuesserSetup';
+import type { SetupContextType } from '../pages/word-guesser/WordGuesserSetup';
 
 export default function ManageWords() {
   const { wordLists, loadLists } = useOutletContext<SetupContextType>();
   const [filterThemeDbId, setFilterThemeDbId] = useState<string>('');
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  
+
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [modalMode, setModalMode] = useState<'create' | 'edit'>('create');
 
@@ -138,20 +138,20 @@ export default function ManageWords() {
               Supprimer ({selectedIds.size})
             </Button>
           )}
-          <IconButton 
-            aria-label="Ajouter un mot" 
-            icon={<AddIcon />} 
-            colorScheme="brand" 
+          <IconButton
+            aria-label="Ajouter un mot"
+            icon={<AddIcon />}
+            colorScheme="brand"
             size="md"
-            onClick={handleOpenCreate} 
+            onClick={handleOpenCreate}
             borderRadius="12px"
           />
         </Flex>
       </Flex>
 
       <Box mb={6}>
-        <Select 
-          value={filterThemeDbId} 
+        <Select
+          value={filterThemeDbId}
           onChange={(e) => setFilterThemeDbId(e.target.value)}
           variant="filled"
           bg="rgba(255, 255, 255, 0.6)"
@@ -201,13 +201,13 @@ export default function ManageWords() {
                   <Td fontWeight="bold" color="brand.600" fontSize={{ base: 'md', md: 'lg' }}>{w.word}</Td>
                   <Td display={{ base: 'none', md: 'table-cell' }} color="gray.500">{w.themeTitle}</Td>
                   <Td textAlign="center">
-                    <Tooltip 
-                      hasArrow 
+                    <Tooltip
+                      hasArrow
                       label={
                         <VStack align="start" spacing={1} p={2}>
                           {w.clues.map((c, i) => <Text key={i}>• {c}</Text>)}
                         </VStack>
-                      } 
+                      }
                       bg="gray.800"
                       color="white"
                       borderRadius="8px"
@@ -238,10 +238,10 @@ export default function ManageWords() {
             <ModalBody pb={6}>
               <FormControl isRequired mb={4}>
                 <FormLabel>Le mot</FormLabel>
-                <Input 
-                  placeholder="ex: Football" 
-                  value={formWord} 
-                  onChange={e => setFormWord(e.target.value)} 
+                <Input
+                  placeholder="ex: Football"
+                  value={formWord}
+                  onChange={e => setFormWord(e.target.value)}
                   variant="glass"
                 />
               </FormControl>
@@ -249,8 +249,8 @@ export default function ManageWords() {
               {modalMode === 'create' && (
                 <FormControl isRequired mb={4}>
                   <FormLabel>Thème</FormLabel>
-                  <Select 
-                    value={formThemeDbId} 
+                  <Select
+                    value={formThemeDbId}
                     onChange={e => setFormThemeDbId(e.target.value)}
                     variant="filled"
                     bg="rgba(255, 255, 255, 0.6)"
@@ -267,7 +267,7 @@ export default function ManageWords() {
               <FormControl isRequired mb={2}>
                 <FormLabel>Indices (au moins 1 requis)</FormLabel>
               </FormControl>
-              
+
               <VStack spacing={3} align="stretch" mb={4}>
                 {formClues.map((clue, idx) => (
                   <HStack key={idx}>
@@ -283,26 +283,26 @@ export default function ManageWords() {
                       variant="glass"
                     />
                     {formClues.length > 1 && (
-                      <IconButton 
-                        aria-label="Supprimer indice" 
-                        icon={<CloseIcon />} 
-                        size="sm" 
-                        colorScheme="red" 
-                        variant="ghost" 
-                        onClick={() => setFormClues(formClues.filter((_, i) => i !== idx))} 
+                      <IconButton
+                        aria-label="Supprimer indice"
+                        icon={<CloseIcon />}
+                        size="sm"
+                        colorScheme="red"
+                        variant="ghost"
+                        onClick={() => setFormClues(formClues.filter((_, i) => i !== idx))}
                       />
                     )}
                   </HStack>
                 ))}
               </VStack>
-              
+
               {formClues.length < 3 && (
-                <Button 
-                  onClick={() => setFormClues([...formClues, ''])} 
-                  variant="outline" 
-                  colorScheme="brand" 
-                  size="sm" 
-                  w="100%" 
+                <Button
+                  onClick={() => setFormClues([...formClues, ''])}
+                  variant="outline"
+                  colorScheme="brand"
+                  size="sm"
+                  w="100%"
                   borderStyle="dashed"
                 >
                   + Ajouter un indice

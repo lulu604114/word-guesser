@@ -51,6 +51,18 @@ const HomePage: React.FC = () => {
               Jeu de devinettes de mots avec des indices.
             </Text>
           </Box>
+          <Box 
+            layerStyle="card"
+            onClick={() => navigate('/prosody')}
+            position="relative"
+          >
+            <Heading as="h3" size="md" mb={2} color="gray.800">
+              Prosodie
+            </Heading>
+            <Text color="gray.500" fontSize="sm">
+              Module d'apprentissage et d'entraînement à la prosodie.
+            </Text>
+          </Box>
         </SimpleGrid>
       </Box>
     </Flex>

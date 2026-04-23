@@ -7,13 +7,13 @@ import {
 } from '@chakra-ui/react';
 import { AddIcon, EditIcon, DeleteIcon } from '@chakra-ui/icons';
 import { addTheme, updateTheme, deleteTheme, type DbWordList } from '../data/wordListsManager';
-import type { SetupContextType } from '../pages/WordGuesserSetup';
+import type { SetupContextType } from '../pages/word-guesser/WordGuesserSetup';
 
 export default function ManageThemes() {
   const { wordLists, loadLists } = useOutletContext<SetupContextType>();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [modalMode, setModalMode] = useState<'create' | 'edit'>('create');
-  
+
   const [formThemeDbId, setFormThemeDbId] = useState<string | null>(null);
   const [formShortId, setFormShortId] = useState('');
   const [formTitle, setFormTitle] = useState('');
@@ -73,15 +73,15 @@ export default function ManageThemes() {
     <Box layerStyle="glass">
       <Flex justify="space-between" align="center" mb={6}>
         <Heading as="h3" size="lg" color="brand.600">Thèmes</Heading>
-        <IconButton 
-          aria-label="Ajouter un thème" 
-          icon={<AddIcon />} 
-          colorScheme="brand" 
-          onClick={handleOpenCreate} 
+        <IconButton
+          aria-label="Ajouter un thème"
+          icon={<AddIcon />}
+          colorScheme="brand"
+          onClick={handleOpenCreate}
           borderRadius="12px"
         />
       </Flex>
-      
+
       {wordLists.length === 0 ? (
         <Text color="gray.500">Aucun thème pour le moment.</Text>
       ) : (
@@ -127,19 +127,19 @@ export default function ManageThemes() {
             <ModalBody pb={6}>
               <FormControl isRequired mb={4}>
                 <FormLabel>Identifiant court</FormLabel>
-                <Input 
-                  placeholder="ex: sports" 
-                  value={formShortId} 
-                  onChange={e => setFormShortId(e.target.value)} 
+                <Input
+                  placeholder="ex: sports"
+                  value={formShortId}
+                  onChange={e => setFormShortId(e.target.value)}
                   variant="glass"
                 />
               </FormControl>
               <FormControl isRequired>
                 <FormLabel>Titre complet</FormLabel>
-                <Input 
-                  placeholder="ex: Les Sports" 
-                  value={formTitle} 
-                  onChange={e => setFormTitle(e.target.value)} 
+                <Input
+                  placeholder="ex: Les Sports"
+                  value={formTitle}
+                  onChange={e => setFormTitle(e.target.value)}
                   variant="glass"
                 />
               </FormControl>

@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import type { WordList } from '../data/wordLists';
-import { useWordLists } from '../hooks/useWordLists';
-import ThemeSelector from '../components/ThemeSelector';
-import Game from '../components/Game';
-import GameOver from '../components/GameOver';
-import AppHeader from '../components/AppHeader';
+import type { WordList } from '../../data/wordLists';
+import { useWordLists } from '../../hooks/useWordLists';
+import ThemeSelector from '../../components/ThemeSelector';
+import Game from '../../components/Game';
+import GameOver from '../../components/GameOver';
+import AppHeader from '../../components/AppHeader';
 import { Box, Flex, Spinner, Heading, Center, Button } from '@chakra-ui/react';
 
 function WordGuesserApp() {
@@ -40,7 +40,7 @@ function WordGuesserApp() {
   const playAgain = () => {
     navigate(-1);
   };
-  
+
   return (
     <Flex direction="column" align="center" w="100%" p={8} maxW="1280px" mx="auto">
       <AppHeader title="Devinettes" />
