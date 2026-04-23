@@ -102,7 +102,8 @@ const ProsodySession: React.FC<ProsodySessionProps> = ({ phrases, onFinish }) =>
       };
 
       mediaRecorderRef.current.onstop = () => {
-        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        const mimeType = mediaRecorderRef.current?.mimeType || 'audio/mp4';
+        const audioBlob = new Blob(audioChunksRef.current, { type: mimeType });
         const url = URL.createObjectURL(audioBlob);
         setAudioUrl(url);
         // Ne pas arrêter les pistes audio ici pour pouvoir réenregistrer instantanément
