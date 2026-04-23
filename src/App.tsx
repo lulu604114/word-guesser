@@ -17,6 +17,7 @@ function App() {
         <Route path="/word-guesser" element={<WordGuesserApp />} />
         <Route path="/word-guesser/:themeId" element={<WordGuesserApp />} />
         <Route path="/prosody" element={<ProsodyApp />} />
+        <Route path="/prosody/:themeId" element={<ProsodyApp />} />
         <Route path="/login" element={<LoginPage />} />
         <Route element={<ProtectedRoute />}>
           <Route path="/setup/word-guesser" element={<WordGuesserSetup />}>

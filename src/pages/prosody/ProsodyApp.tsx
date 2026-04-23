@@ -1,23 +1,63 @@
 import React from 'react';
-import { Flex, Heading, Text } from '@chakra-ui/react';
+import { Flex, Heading, Text, SimpleGrid, Box, Button } from '@chakra-ui/react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { prosodyThemes } from '../../data/prosodyThemes';
+import AppHeader from '../../components/AppHeader';
 
 const ProsodyApp: React.FC = () => {
+  const navigate = useNavigate();
+  const { themeId } = useParams<{ themeId: string }>();
+
+  const selectedTheme = themeId ? prosodyThemes.find(t => t.id === themeId) : null;
+
+  if (themeId && !selectedTheme) {
+    // If invalid theme, redirect to main prosody page
+    navigate('/prosody', { replace: true });
+    return null;
+  }
+
   return (
-    <Flex direction="column" align="center" justify="center" w="100%" h="100vh" p={8}>
-      <Heading 
-        as="h1" 
-        fontSize={{ base: '2.5rem', md: '3.5rem' }} 
-        mb={8} 
-        bgGradient="linear(to-br, #a5b4fc, #818cf8)" 
-        bgClip="text" 
-        textShadow="0 4px 12px rgba(99, 102, 241, 0.2)"
-      >
-        Prosodie
-      </Heading>
-      
-      <Text color="gray.600" fontSize="lg" textAlign="center" maxW="600px">
-        Bienvenue dans le module de prosodie. Ce module est en cours de développement.
-      </Text>
+    <Flex direction="column" align="center" w="100%" p={8} maxW="1280px" mx="auto">
+      <AppHeader title="Prosodie" />
+
+      <Box w="100%" maxW="800px" mt={8}>
+        {!themeId ? (
+          <Box layerStyle="glass">
+            <Heading as="h2" size="md" mb={6} color="gray.500" textAlign="center">
+              Choisissez un thème pour commencer
+            </Heading>
+            
+            <SimpleGrid columns={{ base: 1, sm: 2 }} spacing={6}>
+              {prosodyThemes.map((theme) => (
+                <Box 
+                  key={theme.id} 
+                  layerStyle="card"
+                  onClick={() => navigate(`/prosody/${theme.id}`)}
+                >
+                  <Heading as="h3" size="md" mb={2} color="brand.600">
+                    {theme.title}
+                  </Heading>
+                  <Text color="gray.600" fontSize="sm">
+                    {theme.description}
+                  </Text>
+                </Box>
+              ))}
+            </SimpleGrid>
+          </Box>
+        ) : (
+          <Box layerStyle="glass" textAlign="center" p={10}>
+            <Heading as="h2" size="xl" mb={4} color="brand.600">
+              {selectedTheme?.title}
+            </Heading>
+            <Text color="gray.600" fontSize="lg" mb={8}>
+              Ce module est en cours de développement.
+            </Text>
+            <Button colorScheme="brand" onClick={() => navigate('/prosody')}>
+              Retour aux thèmes
+            </Button>
+          </Box>
+        )}
+      </Box>
     </Flex>
   );
 };
