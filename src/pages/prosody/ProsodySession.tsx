@@ -1,10 +1,30 @@
-import React, { useState } from 'react';
-import { Box, Flex, Heading, Text, IconButton, ButtonGroup, Button, Divider, Progress } from '@chakra-ui/react';
-import { CheckIcon, CloseIcon } from '@chakra-ui/icons';
+import React, { useState, useRef, useEffect } from 'react';
+import { Box, Flex, Heading, Text, IconButton, ButtonGroup, Button, Divider, Progress, Icon } from '@chakra-ui/react';
+import { keyframes } from '@emotion/react';
+import { CheckIcon, CloseIcon, DeleteIcon } from '@chakra-ui/icons';
+
+const pulseAnimation = keyframes`
+  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(229, 62, 62, 0.7); }
+  70% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(229, 62, 62, 0); }
+  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(229, 62, 62, 0); }
+`;
+
+const MicrophoneIcon = (props: any) => (
+  <Icon viewBox="0 0 24 24" {...props}>
+    <path fill="currentColor" d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.91-3c-.49 0-.9.39-.9.88 0 2.76-2.24 5-5.01 5s-5.01-2.24-5.01-5c0-.49-.41-.88-.9-.88s-.9.39-.9.88c0 3.31 2.45 6.04 5.61 6.46V21h-3c-.55 0-1 .45-1 1s.45 1 1 1h8c.55 0 1-.45 1-1s-.45-1-1-1h-3v-2.66c3.16-.42 5.61-3.15 5.61-6.46 0-.49-.41-.88-.9-.88z" />
+  </Icon>
+);
+
+const StopIcon = (props: any) => (
+  <Icon viewBox="0 0 24 24" {...props}>
+    <path fill="currentColor" d="M6 6h12v12H6z" />
+  </Icon>
+);
 
 export interface ProsodyResult {
   phrase: string;
   isValidated: boolean;
+  audioUrl?: string | null;
 }
 
 interface ProsodySessionProps {
@@ -25,31 +45,123 @@ const ProsodySession: React.FC<ProsodySessionProps> = ({ phrases, onFinish }) =>
   const [results, setResults] = useState<ProsodyResult[]>([]);
   const [selectedDifficulty, setSelectedDifficulty] = useState<DifficultyId>('short');
 
+  const [isRecording, setIsRecording] = useState(false);
+  const [isInitializingMic, setIsInitializingMic] = useState(false);
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const audioChunksRef = useRef<BlobPart[]>([]);
+
   // Phrases de la difficulté sélectionnée
   const currentDifficultyPhrases = phrases.filter(p => getDifficultyInfo(p).id === selectedDifficulty);
-  
+
   // Phrases non encore jouées dans cette difficulté
   const unplayedPhrases = currentDifficultyPhrases.filter(p => !results.some(r => r.phrase === p));
   const currentPhrase = unplayedPhrases.length > 0 ? unplayedPhrases[0] : null;
 
+  const discardAudio = () => {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+    }
+    if (audioUrl) {
+      URL.revokeObjectURL(audioUrl);
+      setAudioUrl(null);
+    }
+  };
+
+  const stopRecordingUI = () => {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+    }
+    setAudioUrl(null);
+  };
+
+  const startRecording = async () => {
+    try {
+      if (!streamRef.current) {
+        setIsInitializingMic(true);
+        streamRef.current = await navigator.mediaDevices.getUserMedia({ 
+          audio: {
+            echoCancellation: false,
+            noiseSuppression: false,
+            autoGainControl: true
+          } 
+        });
+        setIsInitializingMic(false);
+      }
+
+      mediaRecorderRef.current = new MediaRecorder(streamRef.current);
+      audioChunksRef.current = [];
+
+      mediaRecorderRef.current.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          audioChunksRef.current.push(event.data);
+        }
+      };
+
+      mediaRecorderRef.current.onstop = () => {
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        const url = URL.createObjectURL(audioBlob);
+        setAudioUrl(url);
+        // Ne pas arrêter les pistes audio ici pour pouvoir réenregistrer instantanément
+      };
+
+      mediaRecorderRef.current.start();
+      setIsRecording(true);
+      setAudioUrl(null);
+    } catch (err) {
+      setIsInitializingMic(false);
+      console.error("Erreur d'accès au microphone:", err);
+      alert("Impossible d'accéder au microphone. Veuillez vérifier vos autorisations.");
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+    }
+  };
+
+  // Cleanup au démontage
+  useEffect(() => {
+    return () => {
+      if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+        mediaRecorderRef.current.stop();
+      }
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+      }
+    };
+  }, []);
+
   const handleValidation = (isValidated: boolean) => {
     if (!currentPhrase) return;
     
+    // Save current audioUrl before resetting UI
+    const currentAudioUrl = audioUrl;
+
+    // Reset audio UI before moving to the next phrase
+    stopRecordingUI();
+
     const newResult = {
       phrase: currentPhrase,
-      isValidated
+      isValidated,
+      audioUrl: currentAudioUrl
     };
-    
+
     const nextResults = [...results, newResult];
     setResults(nextResults);
-    
+
     // Auto-switch to next difficulty if current is empty
     const currentDiffRemaining = phrases.filter(p => getDifficultyInfo(p).id === selectedDifficulty && !nextResults.some(r => r.phrase === p)).length;
-    
+
     if (currentDiffRemaining === 0) {
       const difficulties: DifficultyId[] = ['short', 'medium', 'long'];
       const currentIndex = difficulties.indexOf(selectedDifficulty);
-      
+
       for (let i = currentIndex + 1; i < difficulties.length; i++) {
         const nextDiff = difficulties[i];
         const nextRemaining = phrases.filter(p => getDifficultyInfo(p).id === nextDiff && !nextResults.some(r => r.phrase === p)).length;
@@ -86,26 +198,26 @@ const ProsodySession: React.FC<ProsodySessionProps> = ({ phrases, onFinish }) =>
             </Text>
             <Progress value={progress} size="sm" colorScheme="brand" borderRadius="full" bg="blackAlpha.200" />
           </Box>
-          
+
           <ButtonGroup size="sm" isAttached variant="outline" flexShrink={0}>
-            <Button 
-              isActive={selectedDifficulty === 'short'} 
+            <Button
+              isActive={selectedDifficulty === 'short'}
               onClick={() => setSelectedDifficulty('short')}
               isDisabled={getDifficultyCount('short') === 0}
               colorScheme={selectedDifficulty === 'short' ? 'green' : 'gray'}
             >
               Courtes ({getRemainingCount('short')})
             </Button>
-            <Button 
-              isActive={selectedDifficulty === 'medium'} 
+            <Button
+              isActive={selectedDifficulty === 'medium'}
               onClick={() => setSelectedDifficulty('medium')}
               isDisabled={getDifficultyCount('medium') === 0}
               colorScheme={selectedDifficulty === 'medium' ? 'orange' : 'gray'}
             >
               Moyennes ({getRemainingCount('medium')})
             </Button>
-            <Button 
-              isActive={selectedDifficulty === 'long'} 
+            <Button
+              isActive={selectedDifficulty === 'long'}
               onClick={() => setSelectedDifficulty('long')}
               isDisabled={getDifficultyCount('long') === 0}
               colorScheme={selectedDifficulty === 'long' ? 'red' : 'gray'}
@@ -116,20 +228,53 @@ const ProsodySession: React.FC<ProsodySessionProps> = ({ phrases, onFinish }) =>
         </Flex>
       </Box>
 
-      <Box minH="200px" display="flex" alignItems="center" justifyContent="center" mb={10} w="100%">
+      <Box minH="200px" display="flex" flexDirection="column" alignItems="center" justifyContent="center" mb={10} w="100%">
         {currentPhrase ? (
-          <Heading 
-            as="h2" 
-            size="2xl" 
-            textAlign="center" 
-            color="gray.800"
-            lineHeight="1.4"
-          >
-            {currentPhrase}
-          </Heading>
+          <>
+            <Heading
+              as="h2"
+              size="2xl"
+              textAlign="center"
+              color="gray.800"
+              lineHeight="1.4"
+              mb={8}
+            >
+              {currentPhrase}
+            </Heading>
+
+            {/* Audio Recording Section */}
+            <Flex direction="column" align="center" minH="80px">
+              {!audioUrl ? (
+                <Button
+                  colorScheme={isRecording ? 'red' : 'brand'}
+                  size="lg"
+                  borderRadius="full"
+                  w="64px"
+                  h="64px"
+                  isLoading={isInitializingMic}
+                  onClick={isRecording ? stopRecording : startRecording}
+                  animation={isRecording ? `${pulseAnimation} 1.5s infinite` : undefined}
+                >
+                  {isRecording ? <StopIcon boxSize={6} /> : <MicrophoneIcon boxSize={6} />}
+                </Button>
+              ) : (
+                <Flex align="center" gap={4} bg="gray.50" p={2} pr={4} borderRadius="full" border="1px solid" borderColor="gray.200">
+                  <IconButton
+                    aria-label="Recommencer l'enregistrement"
+                    icon={<DeleteIcon />}
+                    colorScheme="gray"
+                    variant="ghost"
+                    isRound
+                    onClick={discardAudio}
+                  />
+                  <audio controls src={audioUrl} style={{ height: '40px' }} />
+                </Flex>
+              )}
+            </Flex>
+          </>
         ) : (
           <Text fontSize="xl" color="gray.500" textAlign="center" fontStyle="italic">
-            Vous avez terminé toutes les phrases de cette difficulté.<br/>
+            Vous avez terminé toutes les phrases de cette difficulté.<br />
             Sélectionnez une autre difficulté ou terminez l'exercice.
           </Text>
         )}
@@ -174,12 +319,12 @@ const ProsodySession: React.FC<ProsodySessionProps> = ({ phrases, onFinish }) =>
       </Flex>
 
       <Divider mb={6} />
-      
-      <Button 
-        colorScheme="brand" 
-        variant={results.length > 0 ? 'solid' : 'ghost'} 
-        size="lg" 
-        w="100%" 
+
+      <Button
+        colorScheme="brand"
+        variant={results.length > 0 ? 'solid' : 'ghost'}
+        size="lg"
+        w="100%"
         maxW="300px"
         onClick={handleFinish}
         isDisabled={results.length === 0}

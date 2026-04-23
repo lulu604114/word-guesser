@@ -17,8 +17,20 @@ const ProsodyApp: React.FC = () => {
   const selectedTheme = themeId ? prosodyThemes.find(t => t.id === themeId) : null;
   const themePhrases = themeId ? prosodyPhrases[themeId] : null;
 
+  // Cleanup object URLs to avoid memory leaks
+  const cleanupAudio = (results: ProsodyResult[] | null) => {
+    if (results) {
+      results.forEach(r => {
+        if (r.audioUrl) {
+          URL.revokeObjectURL(r.audioUrl);
+        }
+      });
+    }
+  };
+
   // Reset state when theme changes
   useEffect(() => {
+    if (sessionResults) cleanupAudio(sessionResults);
     setIsSessionActive(false);
     setSessionResults(null);
   }, [themeId]);
@@ -30,6 +42,7 @@ const ProsodyApp: React.FC = () => {
   }
 
   const handleStartSession = () => {
+    if (sessionResults) cleanupAudio(sessionResults);
     setIsSessionActive(true);
     setSessionResults(null);
   };
@@ -40,11 +53,13 @@ const ProsodyApp: React.FC = () => {
   };
 
   const handleRestart = () => {
+    if (sessionResults) cleanupAudio(sessionResults);
     setSessionResults(null);
     setIsSessionActive(true);
   };
 
   const handleChangeTheme = () => {
+    if (sessionResults) cleanupAudio(sessionResults);
     navigate('/prosody');
   };
 

@@ -41,7 +41,14 @@ const ProsodySummary: React.FC<ProsodySummaryProps> = ({ results, onRestart, onC
               <Text color="gray.500" fontStyle="italic">Aucune phrase validée.</Text>
             ) : (
               validatedPhrases.map((r, i) => (
-                <Text key={i} color="gray.700">• {r.phrase}</Text>
+                <Box key={i} w="100%">
+                  <Text color="gray.700" fontWeight="medium">• {r.phrase}</Text>
+                  {r.audioUrl && (
+                    <Box mt={2} ml={3}>
+                      <audio controls src={r.audioUrl} style={{ height: '30px', width: '100%', maxWidth: '300px' }} />
+                    </Box>
+                  )}
+                </Box>
               ))
             )}
           </VStack>
@@ -60,7 +67,14 @@ const ProsodySummary: React.FC<ProsodySummaryProps> = ({ results, onRestart, onC
               <Text color="gray.500" fontStyle="italic">Aucune phrase à revoir, parfait !</Text>
             ) : (
               invalidPhrases.map((r, i) => (
-                <Text key={i} color="gray.700">• {r.phrase}</Text>
+                <Box key={i} w="100%">
+                  <Text color="gray.700" fontWeight="medium">• {r.phrase}</Text>
+                  {r.audioUrl && (
+                    <Box mt={2} ml={3}>
+                      <audio controls src={r.audioUrl} style={{ height: '30px', width: '100%', maxWidth: '300px' }} />
+                    </Box>
+                  )}
+                </Box>
               ))
             )}
           </VStack>
