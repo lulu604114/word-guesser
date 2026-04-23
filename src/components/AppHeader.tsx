@@ -15,9 +15,9 @@ const AppHeader: React.FC<AppHeaderProps> = ({ title }) => {
       <IconButton
         position="absolute"
         left="0"
-        aria-label="Retour à l'accueil"
+        aria-label="Retour à la page précédente"
         icon={<ArrowBackIcon boxSize={6} />}
-        onClick={() => navigate('/')}
+        onClick={() => navigate(-1)}
         variant="outline"
         colorScheme="brand"
         borderRadius="full"

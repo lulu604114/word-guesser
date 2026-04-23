@@ -3,7 +3,7 @@ import { useOutletContext } from 'react-router-dom';
 import {
   Box, Button, Flex, Heading, IconButton, Table, Thead, Tbody, Tr, Th, Td, TableContainer,
   Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton,
-  FormControl, FormLabel, Input, useDisclosure, Text, Tooltip, Select, VStack, HStack
+  FormControl, FormLabel, Input, useDisclosure, Text, Tooltip, Select, VStack, HStack, Checkbox
 } from '@chakra-ui/react';
 import { AddIcon, EditIcon, DeleteIcon, CloseIcon, InfoIcon } from '@chakra-ui/icons';
 import { addWordToTheme, updateWord, deleteWord } from '../data/wordListsManager';
@@ -12,6 +12,7 @@ import type { SetupContextType } from '../pages/WordGuesserSetup';
 export default function ManageWords() {
   const { wordLists, loadLists } = useOutletContext<SetupContextType>();
   const [filterThemeDbId, setFilterThemeDbId] = useState<string>('');
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [modalMode, setModalMode] = useState<'create' | 'edit'>('create');
@@ -19,7 +20,7 @@ export default function ManageWords() {
   const [formThemeDbId, setFormThemeDbId] = useState<string>('');
   const [formWordId, setFormWordId] = useState<string | null>(null);
   const [formWord, setFormWord] = useState('');
-  const [formClues, setFormClues] = useState<string[]>(['', '', '']);
+  const [formClues, setFormClues] = useState<string[]>(['']);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleOpenCreate = () => {
@@ -27,7 +28,8 @@ export default function ManageWords() {
     setFormThemeDbId(filterThemeDbId || '');
     setFormWordId(null);
     setFormWord('');
-    setFormClues(['', '', '']);
+    setFormClues(['']);
+    setSelectedIds(new Set());
     onOpen();
   };
 
@@ -79,6 +81,38 @@ export default function ManageWords() {
     }
   };
 
+  const handleDeleteSelected = async () => {
+    if (selectedIds.size === 0) return;
+    if (!confirm(`Voulez-vous vraiment supprimer ${selectedIds.size} mot(s) ?`)) return;
+    setIsLoading(true);
+    try {
+      await Promise.all([...selectedIds].map(id => deleteWord(id)));
+      setSelectedIds(new Set());
+      loadLists();
+    } catch (err) {
+      console.error(err);
+      alert("Erreur lors de la suppression des mots.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedIds.size === displayedWords.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(displayedWords.map(w => w.id)));
+    }
+  };
+
   const allWords = wordLists.flatMap(t =>
     t.words.map(w => ({ ...w, themeDbId: t.db_id, themeTitle: t.title }))
   );
@@ -91,13 +125,28 @@ export default function ManageWords() {
     <Box layerStyle="glass">
       <Flex justify="space-between" align="center" mb={6}>
         <Heading as="h3" size="lg" color="brand.600">Liste des Mots</Heading>
-        <IconButton 
-          aria-label="Ajouter un mot" 
-          icon={<AddIcon />} 
-          colorScheme="brand" 
-          onClick={handleOpenCreate} 
-          borderRadius="12px"
-        />
+        <Flex gap={2} align="center">
+          {selectedIds.size > 0 && (
+            <Button
+              leftIcon={<DeleteIcon />}
+              colorScheme="red"
+              variant="solid"
+              size="md"
+              onClick={handleDeleteSelected}
+              isLoading={isLoading}
+            >
+              Supprimer ({selectedIds.size})
+            </Button>
+          )}
+          <IconButton 
+            aria-label="Ajouter un mot" 
+            icon={<AddIcon />} 
+            colorScheme="brand" 
+            size="md"
+            onClick={handleOpenCreate} 
+            borderRadius="12px"
+          />
+        </Flex>
       </Flex>
 
       <Box mb={6}>
@@ -125,6 +174,14 @@ export default function ManageWords() {
           <Table variant="simple" size={{ base: 'sm', md: 'md' }}>
             <Thead bg="brand.50">
               <Tr>
+                <Th w="40px" pr={0}>
+                  <Checkbox
+                    isChecked={displayedWords.length > 0 && selectedIds.size === displayedWords.length}
+                    isIndeterminate={selectedIds.size > 0 && selectedIds.size < displayedWords.length}
+                    onChange={toggleSelectAll}
+                    colorScheme="brand"
+                  />
+                </Th>
                 <Th>Mot</Th>
                 <Th display={{ base: 'none', md: 'table-cell' }}>Thème</Th>
                 <Th textAlign="center">Indices</Th>
@@ -133,7 +190,14 @@ export default function ManageWords() {
             </Thead>
             <Tbody>
               {displayedWords.map(w => (
-                <Tr key={w.id} _hover={{ bg: 'whiteAlpha.700' }}>
+                <Tr key={w.id} _hover={{ bg: 'whiteAlpha.700' }} bg={selectedIds.has(w.id) ? 'brand.50' : undefined}>
+                  <Td pr={0}>
+                    <Checkbox
+                      isChecked={selectedIds.has(w.id)}
+                      onChange={() => toggleSelect(w.id)}
+                      colorScheme="brand"
+                    />
+                  </Td>
                   <Td fontWeight="bold" color="brand.600" fontSize={{ base: 'md', md: 'lg' }}>{w.word}</Td>
                   <Td display={{ base: 'none', md: 'table-cell' }} color="gray.500">{w.themeTitle}</Td>
                   <Td textAlign="center">
@@ -232,16 +296,18 @@ export default function ManageWords() {
                 ))}
               </VStack>
               
-              <Button 
-                onClick={() => setFormClues([...formClues, ''])} 
-                variant="outline" 
-                colorScheme="brand" 
-                size="sm" 
-                w="100%" 
-                borderStyle="dashed"
-              >
-                + Ajouter un indice
-              </Button>
+              {formClues.length < 3 && (
+                <Button 
+                  onClick={() => setFormClues([...formClues, ''])} 
+                  variant="outline" 
+                  colorScheme="brand" 
+                  size="sm" 
+                  w="100%" 
+                  borderStyle="dashed"
+                >
+                  + Ajouter un indice
+                </Button>
+              )}
             </ModalBody>
             <ModalFooter>
               <Button onClick={onClose} mr={3} variant="ghost">Annuler</Button>

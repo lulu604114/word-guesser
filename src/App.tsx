@@ -14,6 +14,7 @@ function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/word-guesser" element={<WordGuesserApp />} />
+        <Route path="/word-guesser/:themeId" element={<WordGuesserApp />} />
         <Route path="/login" element={<LoginPage />} />
         <Route element={<ProtectedRoute />}>
           <Route path="/setup/word-guesser" element={<WordGuesserSetup />}>

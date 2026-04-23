@@ -21,14 +21,14 @@ const WordGuess: React.FC<WordGuessProps> = ({ wordItem, onCorrectGuess, onSkipG
   const [cluesRevealed, setCluesRevealed] = useState<number>(1);
   const [guess, setGuess] = useState('');
   const [isError, setIsError] = useState(false);
-  const [isRevealed, setIsRevealed] = useState(false);
+  const [matchState, setMatchState] = useState<'guessing' | 'revealed' | 'success'>('guessing');
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (inputRef.current) {
+    if (inputRef.current && matchState === 'guessing') {
       inputRef.current.focus();
     }
-  }, []);
+  }, [matchState]);
 
   const handleRevealClue = () => {
     if (cluesRevealed < wordItem.clues.length) {
@@ -45,33 +45,48 @@ const WordGuess: React.FC<WordGuessProps> = ({ wordItem, onCorrectGuess, onSkipG
       str.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
     if (normalize(guess) === normalize(wordItem.word)) {
-      onCorrectGuess();
+      setMatchState('success');
     } else {
       setIsError(true);
       setTimeout(() => setIsError(false), 500);
     }
   };
 
-  if (isRevealed) {
+  if (matchState !== 'guessing') {
     return (
       <VStack spacing={6} p={4} textAlign="center">
-        <Box>
-          <Text fontSize="xl" fontWeight="bold" color="brand.600" mb={1}>Découverte du mot</Text>
-          <Text color="gray.500">Le mot à trouver était :</Text>
-        </Box>
+        {matchState === 'success' ? (
+          <Box>
+            <Text fontSize="xl" fontWeight="bold" color="green.500" mb={1}>Bonne réponse ! 🎉</Text>
+            <Text color="gray.500">Le mot était bien :</Text>
+          </Box>
+        ) : (
+          <Box>
+            <Text fontSize="xl" fontWeight="bold" color="brand.600" mb={1}>Découverte du mot</Text>
+            <Text color="gray.500">Le mot à trouver était :</Text>
+          </Box>
+        )}
         <Text fontSize="3xl" fontWeight="black" color="brand.500" letterSpacing="widest" textTransform="uppercase">
           {wordItem.word}
         </Text>
         <Box w="100%">
-          <Text color="gray.500" mb={4}>L'aviez-vous trouvé par vous-même ?</Text>
-          <Flex gap={4} justify="center" direction={{ base: 'column', sm: 'row' }}>
-            <Button colorScheme="green" size="lg" onClick={onCorrectGuess} borderRadius="full" px={8}>
-              Oui, trouvé !
+          {matchState === 'success' ? (
+            <Button colorScheme="green" size="lg" onClick={onCorrectGuess} borderRadius="full" px={12} mt={2}>
+              Continuer
             </Button>
-            <Button colorScheme="red" variant="outline" size="lg" onClick={onSkipGuess} borderRadius="full" px={8}>
-              Pas trouvé
-            </Button>
-          </Flex>
+          ) : (
+            <>
+              <Text color="gray.500" mb={4}>L'aviez-vous trouvé par vous-même ?</Text>
+              <Flex gap={4} justify="center" direction={{ base: 'column', sm: 'row' }}>
+                <Button colorScheme="green" size="lg" onClick={onCorrectGuess} borderRadius="full" px={8}>
+                  Oui, trouvé !
+                </Button>
+                <Button colorScheme="red" variant="outline" size="lg" onClick={onSkipGuess} borderRadius="full" px={8}>
+                  Pas trouvé
+                </Button>
+              </Flex>
+            </>
+          )}
         </Box>
       </VStack>
     );
@@ -129,7 +144,7 @@ const WordGuess: React.FC<WordGuessProps> = ({ wordItem, onCorrectGuess, onSkipG
           colorScheme="gray" 
           size="sm" 
           w="100%" 
-          onClick={() => setIsRevealed(true)}
+          onClick={() => setMatchState('revealed')}
         >
           Découvrir le mot
         </Button>
