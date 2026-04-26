@@ -69,12 +69,15 @@ export const useAudioRecorder = (): UseAudioRecorderReturn => {
   // ─── Init microphone (toujours un nouveau stream — destroy-and-reinit) ───
   const initMicrophoneStream = async (): Promise<boolean> => {
     setIsInitializingMic(true);
+    // Sur Safari/iOS, autoGainControl peut réduire le signal en amont de notre GainNode
+    // → on le désactive pour laisser le contrôle du gain à notre chaîne Web Audio
+    const safari = isSafariBrowser();
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: {
           echoCancellation: false,
           noiseSuppression: false,
-          autoGainControl: true,
+          autoGainControl: !safari,
         },
       });
       streamRef.current = stream;
@@ -100,7 +103,7 @@ export const useAudioRecorder = (): UseAudioRecorderReturn => {
       const source = ctx.createMediaStreamSource(rawStream);
       const gainNode = ctx.createGain();
       // Boost uniquement sur Safari/iOS (micro faible) ; Chrome/Firefox ont déjà un bon niveau
-      gainNode.gain.value = isSafariBrowser() ? 2.5 : 1.0;
+      gainNode.gain.value = isSafariBrowser() ? 4.0 : 1.0;
 
       const destination = ctx.createMediaStreamDestination();
       source.connect(gainNode);
