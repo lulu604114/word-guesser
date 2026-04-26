@@ -78,7 +78,7 @@ const ProsodySession: React.FC<ProsodySessionProps> = ({ phrases, onFinish }) =>
     setAudioUrl(null);
   };
 
-  const initMicrophone = async () => {
+  const initMicrophoneStream = async () => {
     if (!streamRef.current) {
       setIsInitializingMic(true);
       try {
@@ -90,29 +90,6 @@ const ProsodySession: React.FC<ProsodySessionProps> = ({ phrases, onFinish }) =>
           } 
         });
         streamRef.current = stream;
-
-        // Configuration haute qualité (128 kbps)
-        const options = { audioBitsPerSecond: 128000 };
-        // Le navigateur peut ignorer les options s'il ne les supporte pas, on essaie de l'utiliser.
-        try {
-          mediaRecorderRef.current = new MediaRecorder(stream, options);
-        } catch (e) {
-          // Fallback if options are not supported (e.g. Safari sometimes)
-          mediaRecorderRef.current = new MediaRecorder(stream);
-        }
-
-        mediaRecorderRef.current.ondataavailable = (event) => {
-          if (event.data.size > 0) {
-            audioChunksRef.current.push(event.data);
-          }
-        };
-
-        mediaRecorderRef.current.onstop = () => {
-          const mimeType = mediaRecorderRef.current?.mimeType || 'audio/mp4';
-          const audioBlob = new Blob(audioChunksRef.current, { type: mimeType });
-          const url = URL.createObjectURL(audioBlob);
-          setAudioUrl(url);
-        };
       } catch (err) {
         console.error("Erreur d'accès au microphone:", err);
         alert("Impossible d'accéder au microphone. Veuillez vérifier vos autorisations.");
@@ -123,16 +100,39 @@ const ProsodySession: React.FC<ProsodySessionProps> = ({ phrases, onFinish }) =>
   };
 
   const startRecording = async () => {
-    if (!streamRef.current || !mediaRecorderRef.current) {
-      await initMicrophone();
+    // S'assurer que le flux du micro est bien initialisé (rapide si déjà fait)
+    if (!streamRef.current) {
+      await initMicrophoneStream();
     }
 
-    if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'inactive') {
-      audioChunksRef.current = [];
-      mediaRecorderRef.current.start();
-      setIsRecording(true);
-      setAudioUrl(null);
+    if (!streamRef.current) return; // Si l'utilisateur a refusé l'accès
+
+    // Créer une NOUVELLE instance de MediaRecorder à chaque fois pour éviter les bugs Safari
+    const options = { audioBitsPerSecond: 128000 };
+    try {
+      mediaRecorderRef.current = new MediaRecorder(streamRef.current, options);
+    } catch (e) {
+      mediaRecorderRef.current = new MediaRecorder(streamRef.current);
     }
+
+    audioChunksRef.current = [];
+
+    mediaRecorderRef.current.ondataavailable = (event) => {
+      if (event.data.size > 0) {
+        audioChunksRef.current.push(event.data);
+      }
+    };
+
+    mediaRecorderRef.current.onstop = () => {
+      const mimeType = mediaRecorderRef.current?.mimeType || 'audio/mp4';
+      const audioBlob = new Blob(audioChunksRef.current, { type: mimeType });
+      const url = URL.createObjectURL(audioBlob);
+      setAudioUrl(url);
+    };
+
+    mediaRecorderRef.current.start();
+    setIsRecording(true);
+    setAudioUrl(null);
   };
 
   const stopRecording = () => {
