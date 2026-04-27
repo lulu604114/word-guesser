@@ -3,7 +3,7 @@ import { useOutletContext } from 'react-router-dom';
 import {
   Box, Button, Flex, Heading, IconButton, Table, Thead, Tbody, Tr, Th, Td, TableContainer,
   Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton,
-  FormControl, FormLabel, Textarea, useDisclosure, Text, Select, Checkbox,
+  FormControl, FormLabel, Textarea, useDisclosure, Text, Select, Checkbox, Badge, Tooltip,
 } from '@chakra-ui/react';
 import { AddIcon, EditIcon, DeleteIcon } from '@chakra-ui/icons';
 import {
@@ -11,6 +11,7 @@ import {
   type ProsodyPhrase,
 } from '../../data/prosodyManager';
 import type { ProsodySetupContextType } from '../../pages/prosody/ProsodySetup';
+import { getDifficultyInfo } from '../../pages/prosody/ProsodySession';
 
 export default function ManageProsodyPhrases() {
   const { themes, phrases, load } = useOutletContext<ProsodySetupContextType>();
@@ -126,6 +127,9 @@ export default function ManageProsodyPhrases() {
       setIsLoading(false);
     }
   };
+
+
+  const difficulty = getDifficultyInfo(formPhrase);
 
   return (
     <Box layerStyle="glass">
@@ -280,7 +284,26 @@ export default function ManageProsodyPhrases() {
                 </FormControl>
               )}
               <FormControl isRequired>
-                <FormLabel>Phrase</FormLabel>
+                <Flex justify="space-between" align="center" mb={1}>
+                  <FormLabel mb={0}>Phrase</FormLabel>
+                  <Tooltip
+                    label={`≤ 3 mots = Courte · ≤ 6 = Moyenne · > 6 = Longue (${formPhrase.trim().split(/\s+/).filter(w => w.match(/[a-zA-ZÀ-ÿ0-9]/)).length} mots)`}
+                    placement="top"
+                    hasArrow
+                  >
+                    <Badge
+                      colorScheme={difficulty.colorScheme}
+                      px={3}
+                      py={1}
+                      borderRadius="full"
+                      fontSize="xs"
+                      cursor="default"
+                      transition="all 0.2s"
+                    >
+                      {formPhrase.trim() ? difficulty.label : '—'}
+                    </Badge>
+                  </Tooltip>
+                </Flex>
                 <Textarea
                   placeholder="ex: Est-ce que tu viens avec nous ?"
                   value={formPhrase}
