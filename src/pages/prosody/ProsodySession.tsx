@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Box, Flex, Heading, Text, IconButton, ButtonGroup, Button, Divider, Progress, Icon } from '@chakra-ui/react';
 import { keyframes } from '@emotion/react';
 import { CheckIcon, CloseIcon, DeleteIcon } from '@chakra-ui/icons';
@@ -62,6 +62,30 @@ const ProsodySession: React.FC<ProsodySessionProps> = ({ phrases, onFinish }) =>
   // Phrases non encore jouées dans cette difficulté
   const unplayedPhrases = currentDifficultyPhrases.filter(p => !results.some(r => r.phrase === p));
   const currentPhrase = unplayedPhrases.length > 0 ? unplayedPhrases[0] : null;
+
+  // ─── Raccourci clavier : Espace = start/stop enregistrement ─────────────
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    if (e.code !== 'Space') return;
+    // Ignorer si le focus est sur un élément interactif (bouton, input...)
+    const tag = (e.target as HTMLElement)?.tagName;
+    if (tag === 'BUTTON' || tag === 'INPUT' || tag === 'TEXTAREA') return;
+    // Ignorer si un audio est déjà enregistré (l'utilisateur doit d'abord valider ou supprimer)
+    if (audioUrl) return;
+    // Ignorer s'il n'y a pas de phrase active
+    if (!currentPhrase) return;
+
+    e.preventDefault(); // évite le scroll de page
+    if (isRecording) {
+      stopRecording();
+    } else {
+      startRecording();
+    }
+  }, [audioUrl, currentPhrase, isRecording, startRecording, stopRecording]);
+
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleKeyDown]);
 
   const handleValidation = (isValidated: boolean) => {
     if (!currentPhrase) return;
