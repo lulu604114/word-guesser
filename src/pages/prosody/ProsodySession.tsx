@@ -37,8 +37,8 @@ type DifficultyId = 'short' | 'medium' | 'long';
 
 export const getDifficultyInfo = (phrase: string): { id: DifficultyId; label: string; colorScheme: string } => {
   const wordCount = phrase.trim().split(/\s+/).filter(word => word.match(/[a-zA-ZÀ-ÿ0-9]/)).length;
-  if (wordCount <= 3) return { id: 'short', label: 'Courte', colorScheme: 'green' };
-  if (wordCount <= 6) return { id: 'medium', label: 'Moyenne', colorScheme: 'orange' };
+  if (wordCount <= 4) return { id: 'short', label: 'Courte', colorScheme: 'green' };
+  if (wordCount <= 8) return { id: 'medium', label: 'Moyenne', colorScheme: 'orange' };
   return { id: 'long', label: 'Longue', colorScheme: 'red' };
 };
 

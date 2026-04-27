@@ -287,7 +287,7 @@ export default function ManageProsodyPhrases() {
                 <Flex justify="space-between" align="center" mb={1}>
                   <FormLabel mb={0}>Phrase</FormLabel>
                   <Tooltip
-                    label={`≤ 3 mots = Courte · ≤ 6 = Moyenne · > 6 = Longue (${formPhrase.trim().split(/\s+/).filter(w => w.match(/[a-zA-ZÀ-ÿ0-9]/)).length} mots)`}
+                    label={`≤ 4 mots = Courte · 5–8 = Moyenne · ≥ 9 = Longue (${formPhrase.trim().split(/\s+/).filter(w => w.match(/[a-zA-ZÀ-ÿ0-9]/)).length} mots)`}
                     placement="top"
                     hasArrow
                   >
