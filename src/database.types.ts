@@ -39,6 +39,53 @@ export type Database = {
   }
   public: {
     Tables: {
+      prosody_themes: {
+        Row: {
+          id: string
+          short_id: string
+          title: string
+          description: string
+        }
+        Insert: {
+          id?: string
+          short_id: string
+          title: string
+          description?: string
+        }
+        Update: {
+          id?: string
+          short_id?: string
+          title?: string
+          description?: string
+        }
+        Relationships: []
+      }
+      prosody_phrases: {
+        Row: {
+          id: string
+          theme_id: string | null
+          phrase: string
+        }
+        Insert: {
+          id?: string
+          theme_id?: string | null
+          phrase: string
+        }
+        Update: {
+          id?: string
+          theme_id?: string | null
+          phrase?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prosody_phrases_theme_id_fkey"
+            columns: ["theme_id"]
+            isOneToOne: false
+            referencedRelation: "prosody_themes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       clues: {
         Row: {
           clue_text: string

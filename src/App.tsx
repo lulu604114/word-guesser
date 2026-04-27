@@ -3,8 +3,11 @@ import HomePage from './pages/HomePage';
 import WordGuesserApp from './pages/word-guesser/WordGuesserApp';
 import WordGuesserSetup from './pages/word-guesser/WordGuesserSetup';
 import ProsodyApp from './pages/prosody/ProsodyApp';
+import ProsodySetup from './pages/prosody/ProsodySetup';
 import ManageThemes from './components/ManageThemes';
 import ManageWords from './components/ManageWords';
+import ManageProsodyThemes from './components/prosody/ManageProsodyThemes';
+import ManageProsodyPhrases from './components/prosody/ManageProsodyPhrases';
 import LoginPage from './pages/LoginPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider } from './contexts/AuthContext';
@@ -24,6 +27,11 @@ function App() {
             <Route index element={<Navigate to="themes" replace />} />
             <Route path="themes" element={<ManageThemes />} />
             <Route path="words" element={<ManageWords />} />
+          </Route>
+          <Route path="/setup/prosody" element={<ProsodySetup />}>
+            <Route index element={<Navigate to="themes" replace />} />
+            <Route path="themes" element={<ManageProsodyThemes />} />
+            <Route path="phrases" element={<ManageProsodyPhrases />} />
           </Route>
         </Route>
       </Routes>

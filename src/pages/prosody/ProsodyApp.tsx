@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Flex, Heading, Text, SimpleGrid, Box, Button } from '@chakra-ui/react';
+import { Flex, Heading, Text, SimpleGrid, Box, Button, Spinner, Center } from '@chakra-ui/react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { prosodyThemes } from '../../data/prosodyThemes';
-import { prosodyPhrases } from '../../data/prosodyData';
 import AppHeader from '../../components/AppHeader';
 import ProsodySession from './ProsodySession';
 import type { ProsodyResult } from './ProsodySession';
 import ProsodySummary from './ProsodySummary';
+import { useProsodyAdmin } from '../../hooks/useProsodyAdmin';
 
 const ProsodyApp: React.FC = () => {
   const navigate = useNavigate();
@@ -14,16 +13,27 @@ const ProsodyApp: React.FC = () => {
   const [isSessionActive, setIsSessionActive] = useState(false);
   const [sessionResults, setSessionResults] = useState<ProsodyResult[] | null>(null);
 
-  const selectedTheme = themeId ? prosodyThemes.find(t => t.id === themeId) : null;
-  const themePhrases = themeId ? prosodyPhrases[themeId] : null;
+  const { themes, phrases, isLoading } = useProsodyAdmin();
+
+  // Build a phrases map keyed by theme short_id for O(1) lookup
+  const phrasesMap = React.useMemo(() => {
+    const map: Record<string, string[]> = {};
+    for (const theme of themes) {
+      map[theme.short_id] = phrases
+        .filter(p => p.theme_id === theme.id)
+        .map(p => p.phrase);
+    }
+    return map;
+  }, [themes, phrases]);
+
+  const selectedTheme = themeId ? themes.find(t => t.short_id === themeId) : null;
+  const themePhrases = themeId ? (phrasesMap[themeId] ?? null) : null;
 
   // Cleanup object URLs to avoid memory leaks
   const cleanupAudio = (results: ProsodyResult[] | null) => {
     if (results) {
       results.forEach(r => {
-        if (r.audioUrl) {
-          URL.revokeObjectURL(r.audioUrl);
-        }
+        if (r.audioUrl) URL.revokeObjectURL(r.audioUrl);
       });
     }
   };
@@ -35,8 +45,16 @@ const ProsodyApp: React.FC = () => {
     setSessionResults(null);
   }, [themeId]);
 
+  if (isLoading) {
+    return (
+      <Center h="60vh" flexDir="column" gap={4}>
+        <Spinner size="xl" color="brand.500" thickness="4px" />
+        <Heading size="md" color="brand.600">Chargement des thèmes...</Heading>
+      </Center>
+    );
+  }
+
   if (themeId && !selectedTheme) {
-    // If invalid theme, redirect to main prosody page
     navigate('/prosody', { replace: true });
     return null;
   }
@@ -73,15 +91,15 @@ const ProsodyApp: React.FC = () => {
             <Heading as="h2" size="md" mb={6} color="gray.500" textAlign="center">
               Choisissez un thème pour commencer
             </Heading>
-            
+
             <SimpleGrid columns={{ base: 1, sm: 2 }} spacing={6}>
-              {prosodyThemes.map((theme) => {
-                const phraseCount = prosodyPhrases[theme.id]?.length || 0;
+              {themes.map(theme => {
+                const phraseCount = phrasesMap[theme.short_id]?.length ?? 0;
                 return (
-                  <Box 
-                    key={theme.id} 
+                  <Box
+                    key={theme.id}
                     layerStyle="card"
-                    onClick={() => navigate(`/prosody/${theme.id}`)}
+                    onClick={() => navigate(`/prosody/${theme.short_id}`)}
                     position="relative"
                   >
                     <Heading as="h3" size="md" mb={2} color="brand.600">
@@ -107,17 +125,17 @@ const ProsodyApp: React.FC = () => {
         ) : isSessionActive && themePhrases ? (
           <ProsodySession phrases={themePhrases} onFinish={handleFinishSession} />
         ) : sessionResults ? (
-          <ProsodySummary 
-            results={sessionResults} 
-            onRestart={handleRestart} 
-            onChangeTheme={handleChangeTheme} 
+          <ProsodySummary
+            results={sessionResults}
+            onRestart={handleRestart}
+            onChangeTheme={handleChangeTheme}
           />
         ) : (
           <Box layerStyle="glass" textAlign="center" p={10}>
             <Heading as="h2" size="xl" mb={4} color="brand.600">
               {selectedTheme?.title}
             </Heading>
-            
+
             {themePhrases && themePhrases.length > 0 ? (
               <>
                 <Text color="gray.600" fontSize="lg" mb={8}>
