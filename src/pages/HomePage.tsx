@@ -56,6 +56,20 @@ const HomePage: React.FC = () => {
             onClick={() => navigate('/prosody')}
             position="relative"
           >
+            <IconButton
+              aria-label="Paramètres de la prosodie"
+              icon={<SettingsIcon />}
+              position="absolute"
+              top={2}
+              right={2}
+              size="sm"
+              variant="ghost"
+              colorScheme="brand"
+              onClick={(e) => {
+                e.stopPropagation();
+                navigate('/setup/prosody');
+              }}
+            />
             <Heading as="h3" size="md" mb={2} color="gray.800">
               Prosodie
             </Heading>
