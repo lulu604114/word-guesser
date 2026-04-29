@@ -24,7 +24,10 @@ const CebSetup: React.FC = () => {
     navigate('/login');
   };
 
-  if (isLoading) return (
+  // Only block render on the very first load (no data yet).
+  // Subsequent reloads (after save) must NOT unmount the Outlet — otherwise
+  // child component state (e.g. selectedTextId) is lost.
+  if (isLoading && texts.length === 0) return (
     <Center h="100vh" flexDir="column" gap={4}>
       <Spinner size="xl" color="brand.500" thickness="4px" />
       <Heading size="md" color="brand.600">Chargement des données CEB...</Heading>
