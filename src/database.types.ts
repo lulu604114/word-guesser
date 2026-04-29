@@ -39,6 +39,97 @@ export type Database = {
   }
   public: {
     Tables: {
+      ceb_texts: {
+        Row: {
+          id: string
+          title: string
+          level: string
+          content: string
+          created_at: string | null
+        }
+        Insert: {
+          id?: string
+          title: string
+          level: string
+          content: string
+          created_at?: string | null
+        }
+        Update: {
+          id?: string
+          title?: string
+          level?: string
+          content?: string
+          created_at?: string | null
+        }
+        Relationships: []
+      }
+      ceb_questions: {
+        Row: {
+          id: string
+          text_id: string | null
+          order_index: number
+          type: string
+          question_text: string
+          draft_answer: string
+        }
+        Insert: {
+          id?: string
+          text_id?: string | null
+          order_index: number
+          type: string
+          question_text: string
+          draft_answer?: string
+        }
+        Update: {
+          id?: string
+          text_id?: string | null
+          order_index?: number
+          type?: string
+          question_text?: string
+          draft_answer?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ceb_questions_text_id_fkey"
+            columns: ["text_id"]
+            isOneToOne: false
+            referencedRelation: "ceb_texts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ceb_options: {
+        Row: {
+          id: string
+          question_id: string | null
+          option_text: string
+          is_correct: boolean
+          order_index: number
+        }
+        Insert: {
+          id?: string
+          question_id?: string | null
+          option_text: string
+          is_correct?: boolean
+          order_index: number
+        }
+        Update: {
+          id?: string
+          question_id?: string | null
+          option_text?: string
+          is_correct?: boolean
+          order_index?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ceb_options_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "ceb_questions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       prosody_themes: {
         Row: {
           id: string

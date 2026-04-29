@@ -77,6 +77,32 @@ const HomePage: React.FC = () => {
               Module d'apprentissage et d'entraînement à la prosodie.
             </Text>
           </Box>
+          <Box 
+            layerStyle="card"
+            onClick={() => navigate('/ceb')}
+            position="relative"
+          >
+            <IconButton
+              aria-label="Paramètres CEB"
+              icon={<SettingsIcon />}
+              position="absolute"
+              top={2}
+              right={2}
+              size="sm"
+              variant="ghost"
+              colorScheme="brand"
+              onClick={(e) => {
+                e.stopPropagation();
+                navigate('/setup/ceb');
+              }}
+            />
+            <Heading as="h3" size="md" mb={2} color="gray.800">
+              CEB Interactif
+            </Heading>
+            <Text color="gray.500" fontSize="sm">
+              Lecture de textes avec questions interactives et surlignage.
+            </Text>
+          </Box>
         </SimpleGrid>
       </Box>
     </Flex>

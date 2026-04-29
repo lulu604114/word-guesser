@@ -4,10 +4,14 @@ import WordGuesserApp from './pages/word-guesser/WordGuesserApp';
 import WordGuesserSetup from './pages/word-guesser/WordGuesserSetup';
 import ProsodyApp from './pages/prosody/ProsodyApp';
 import ProsodySetup from './pages/prosody/ProsodySetup';
+import CebApp from './pages/ceb/CebApp';
+import CebSetup from './pages/ceb/CebSetup';
 import ManageThemes from './components/ManageThemes';
 import ManageWords from './components/ManageWords';
 import ManageProsodyThemes from './components/prosody/ManageProsodyThemes';
 import ManageProsodyPhrases from './components/prosody/ManageProsodyPhrases';
+import ManageCebTexts from './components/ceb/ManageCebTexts';
+import ManageCebQuestions from './components/ceb/ManageCebQuestions';
 import LoginPage from './pages/LoginPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider } from './contexts/AuthContext';
@@ -21,6 +25,7 @@ function App() {
         <Route path="/word-guesser/:themeId" element={<WordGuesserApp />} />
         <Route path="/prosody" element={<ProsodyApp />} />
         <Route path="/prosody/:themeId" element={<ProsodyApp />} />
+        <Route path="/ceb" element={<CebApp />} />
         <Route path="/login" element={<LoginPage />} />
         <Route element={<ProtectedRoute />}>
           <Route path="/setup/word-guesser" element={<WordGuesserSetup />}>
@@ -32,6 +37,11 @@ function App() {
             <Route index element={<Navigate to="themes" replace />} />
             <Route path="themes" element={<ManageProsodyThemes />} />
             <Route path="phrases" element={<ManageProsodyPhrases />} />
+          </Route>
+          <Route path="/setup/ceb" element={<CebSetup />}>
+            <Route index element={<Navigate to="texts" replace />} />
+            <Route path="texts" element={<ManageCebTexts />} />
+            <Route path="questions" element={<ManageCebQuestions />} />
           </Route>
         </Route>
       </Routes>
