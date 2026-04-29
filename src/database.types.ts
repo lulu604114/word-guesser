@@ -39,6 +39,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      cestpour_items: {
+        Row: {
+          id: string
+          object_name: string
+          image_url: string
+          correct_answer: string
+          wrong_answer: string
+          order_index: number
+          created_at: string | null
+        }
+        Insert: {
+          id?: string
+          object_name: string
+          image_url?: string
+          correct_answer: string
+          wrong_answer: string
+          order_index?: number
+          created_at?: string | null
+        }
+        Update: {
+          id?: string
+          object_name?: string
+          image_url?: string
+          correct_answer?: string
+          wrong_answer?: string
+          order_index?: number
+          created_at?: string | null
+        }
+        Relationships: []
+      }
       ceb_texts: {
         Row: {
           id: string

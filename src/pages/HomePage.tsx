@@ -103,6 +103,32 @@ const HomePage: React.FC = () => {
               Lecture de textes avec questions interactives et surlignage.
             </Text>
           </Box>
+          <Box 
+            layerStyle="card"
+            onClick={() => navigate('/cestpour')}
+            position="relative"
+          >
+            <IconButton
+              aria-label="Paramètres C'est pour"
+              icon={<SettingsIcon />}
+              position="absolute"
+              top={2}
+              right={2}
+              size="sm"
+              variant="ghost"
+              colorScheme="brand"
+              onClick={(e) => {
+                e.stopPropagation();
+                navigate('/setup/cestpour');
+              }}
+            />
+            <Heading as="h3" size="md" mb={2} color="gray.800">
+              C'est pour...
+            </Heading>
+            <Text color="gray.500" fontSize="sm">
+              Identifier la fonction d'un objet en complétant la phrase.
+            </Text>
+          </Box>
         </SimpleGrid>
       </Box>
     </Flex>

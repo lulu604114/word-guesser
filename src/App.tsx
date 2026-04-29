@@ -12,6 +12,9 @@ import ManageProsodyThemes from './components/prosody/ManageProsodyThemes';
 import ManageProsodyPhrases from './components/prosody/ManageProsodyPhrases';
 import ManageCebTexts from './components/ceb/ManageCebTexts';
 import ManageCebQuestions from './components/ceb/ManageCebQuestions';
+import CestPourApp from './pages/cestpour/CestPourApp';
+import CestPourSetup from './pages/cestpour/CestPourSetup';
+import ManageCestPourItems from './components/cestpour/ManageCestPourItems';
 import LoginPage from './pages/LoginPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider } from './contexts/AuthContext';
@@ -26,6 +29,7 @@ function App() {
         <Route path="/prosody" element={<ProsodyApp />} />
         <Route path="/prosody/:themeId" element={<ProsodyApp />} />
         <Route path="/ceb" element={<CebApp />} />
+        <Route path="/cestpour" element={<CestPourApp />} />
         <Route path="/login" element={<LoginPage />} />
         <Route element={<ProtectedRoute />}>
           <Route path="/setup/word-guesser" element={<WordGuesserSetup />}>
@@ -42,6 +46,9 @@ function App() {
             <Route index element={<Navigate to="texts" replace />} />
             <Route path="texts" element={<ManageCebTexts />} />
             <Route path="questions" element={<ManageCebQuestions />} />
+          </Route>
+          <Route path="/setup/cestpour" element={<CestPourSetup />}>
+            <Route index element={<ManageCestPourItems />} />
           </Route>
         </Route>
       </Routes>
