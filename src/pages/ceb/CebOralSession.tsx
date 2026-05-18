@@ -70,37 +70,33 @@ const CebOralSession: React.FC<CebOralSessionProps> = ({ text, onExit }) => {
 
   const getFrenchVoice = (): SpeechSynthesisVoice | null => {
     const voices = window.speechSynthesis.getVoices();
-    return (
-      voices.find(v => v.lang.startsWith('fr')) ?? voices[0] ?? null
+    const fr = voices.filter(v => v.lang.startsWith('fr'));
+
+    // Priorité aux voix premium/neural (Google, Apple, Microsoft)
+    const premium = fr.find(v =>
+      /premium|enhanced|neural|natural|amelie|thomas|marie|google|com\.apple/i.test(v.name)
     );
+    return premium ?? fr[0] ?? voices[0] ?? null;
   };
 
-  const handlePlay = useCallback(() => {
-    if (ttsState === 'paused') {
-      window.speechSynthesis.resume();
-      setTtsState('playing');
-      return;
-    }
-
+  const startUtterance = useCallback(() => {
     window.speechSynthesis.cancel();
 
     const utterance = new SpeechSynthesisUtterance(text.content);
     utterance.lang = 'fr-FR';
-    utterance.rate = 0.9;
+    utterance.rate = 0.85;
     utterance.pitch = 1.0;
 
     const voice = getFrenchVoice();
     if (voice) utterance.voice = voice;
 
     // Track sentence progress via boundary events
-    let charIdx = 0;
     utterance.onboundary = (event) => {
       if (event.name === 'sentence') {
-        charIdx = event.charIndex;
-        // Find which sentence we're in
+        const charIdx = event.charIndex;
         let cumLen = 0;
         for (let i = 0; i < sentences.length; i++) {
-          cumLen += sentences[i].length + 1; // +1 for space
+          cumLen += sentences[i].length + 1;
           if (charIdx < cumLen) {
             setCurrentSentenceIdx(i);
             break;
@@ -126,7 +122,26 @@ const CebOralSession: React.FC<CebOralSessionProps> = ({ text, onExit }) => {
 
     utteranceRef.current = utterance;
     window.speechSynthesis.speak(utterance);
-  }, [text.content, ttsState, sentences]);
+  }, [text.content, sentences]);
+
+  const handlePlay = useCallback(() => {
+    if (ttsState === 'paused') {
+      window.speechSynthesis.resume();
+      setTtsState('playing');
+      return;
+    }
+
+    // Sur Chrome, les voix se chargent de manière asynchrone
+    const voices = window.speechSynthesis.getVoices();
+    if (voices.length === 0) {
+      window.speechSynthesis.onvoiceschanged = () => {
+        window.speechSynthesis.onvoiceschanged = null;
+        startUtterance();
+      };
+    } else {
+      startUtterance();
+    }
+  }, [ttsState, startUtterance]);
 
   const handlePause = () => {
     window.speechSynthesis.pause();
