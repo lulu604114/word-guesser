@@ -5,6 +5,8 @@ import WordGuesserSetup from './pages/word-guesser/WordGuesserSetup';
 import ProsodyApp from './pages/prosody/ProsodyApp';
 import ProsodySetup from './pages/prosody/ProsodySetup';
 import CebApp from './pages/ceb/CebApp';
+import CebEcritApp from './pages/ceb/CebEcritApp';
+import CebOralApp from './pages/ceb/CebOralApp';
 import CebSetup from './pages/ceb/CebSetup';
 import ManageThemes from './components/ManageThemes';
 import ManageWords from './components/ManageWords';
@@ -29,6 +31,8 @@ function App() {
         <Route path="/prosody" element={<ProsodyApp />} />
         <Route path="/prosody/:themeId" element={<ProsodyApp />} />
         <Route path="/ceb" element={<CebApp />} />
+        <Route path="/ceb/ecrit" element={<CebEcritApp />} />
+        <Route path="/ceb/oral" element={<CebOralApp />} />
         <Route path="/cestpour" element={<CestPourApp />} />
         <Route path="/login" element={<LoginPage />} />
         <Route element={<ProtectedRoute />}>
